@@ -1,3 +1,5 @@
+Sometimes summary, sometimes notes, anything I want to document and refer to later...hopefully more of my notes get digitized as well.
+
 # 6/20/2023
 
 ## Meeting with Ian to establish expectations and understand goals
@@ -147,6 +149,14 @@ Git:
       function rc { vim $profile }
       ```
   3. Do basic vim settings ...unfortunately I can't edit the `vimrc` settings in `$VIM` (in program files), and this makes me very frustrated.
+
+# 6/27/2023
+
+## More git stuff
+
+- Setting up workflow -- decided to do most code and editting through VSCode.
+- PGE restrictions are really annoying, couldn't use VSCode's github integration shown [here](https://code.visualstudio.com/docs/sourcecontrol/overview#_3way-merge-editor) because it required downloading VSCode updates!
+- Go to all the steps outlined [here](https://docs.github.com/en/get-started/getting-started-with-git/setting-your-username-in-git), but do all of them in powershell using `git` instead of through `git-bash` application, they don't work otherwise.
 
 
 
