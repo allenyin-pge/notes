@@ -1,0 +1,24 @@
+- GT: Gas transmission
+- TIMP: Transmission integrity management program
+- ILI: In-Line Inspection
+- CE: Continual evaluation
+- SME: Subject matter expert
+- P&M: Preventative and mitigative
+- GIS: Geographic information systems
+- AKM: Asset knowledge management
+- IM: Integrity management
+- DA: Direct assessment
+- IC: Internal corrosion (e.g. ICDA)
+- EC: External corrosion
+- PLE: Pipe Line services Engineer(ing)
+- ST: Strength Test
+- HCA: High Consequence Areas
+- MAOP: Maximum Allowable Operating Pressure
+- SMYS: Specified Minimum Yield Strength
+- AP: ???
+- LOF: Likelihood of failure (LOF_R=for rupture, LOF_L=for leak)
+- COF: Consequence of failure
+- SIF: Significant Injuries or Fatalities
+- ECDA: External Corrosion Direct Assessment
+- POE: Probability of Exceedance
+- IOC: Impacted Occupancy Count

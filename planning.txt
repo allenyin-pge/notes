@@ -1,0 +1,67 @@
+Expectations:
+- 1 month: Learning, tools, etc.
+- 3 month
+- 6 month
+- 1 year
+- Recurring meeting and scheduling
+
+
+Plans:
+- 1 month
+- 3 month
+- 6 month
+- 1 year
+
+
+Problems:
+- Clean up ILI data
+
+
+What are the ultimate goals?
+- Use new model instead of the old risk model
+- Want time and finanical component for the model
+- At least get a calibrated model..
+- Prove to stake-holders to gain trust in the model
+   - What do they need to change the model?
+
+
+To learn:
+- Domain knowledge (read ASME book):
+  - Different types of corrosion and threats
+  - Mechanism of corrosion
+- SOTA on threat modeling (read the PHMSA doc, pipeline risk modeling)
+- Data pipeline:
+  - Types of data available (structured, unstructured, continuous vs. discrete, time series)
+  - How was each type of data collected (procedure, temporal cadence)
+  - Data integration -- ARCGIS tool <-- learn that
+- Data evaluation: How to evaluate if a model is doing well?
+   - Compare against current model on risk scores
+- Model production/deployment: Can we automate it?
+
+---------------------------------
+
+Different types of threat models, what to do with each?
+- Transmission pipe = higher gas (our thing)
+- Incident per mile (composite of all different threat models)
+  - Right now in percentage (1 in 10,000 years) and likelihood of failures
+  - Makes more sense to use dollar amount, and quantify mitigation cost
+
+Other notes:
+- Matters what category it is, because mitigation method matters depending on the type
+- "Top side dents" -- may not always be third-party damage. Different confidence should
+  be assigned to damage measurement.
+  - For TPD: Usually a binary label, can have minimum threshold
+  - 90% evaluation done by this -- in 7 year assessment, not all regions' assessment
+    taken at the same time.
+- Damage evaluation is consistent among evaluators
+- Assessment methods:
+  - picking/sending something through the pipelines,
+  - strain test,
+  - ICDA probe through surface about every ft (passing charges)
+
+Digging up the pipes is very expensive
+- Can use number of digging over time? Can use that as a proxy for mitigation effectivness
+- Other indirect ways of measuring damages
+
+
+PHMSA: Gas regulator, "mandated" the use of quantitative model

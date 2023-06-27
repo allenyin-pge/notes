@@ -1,0 +1,67 @@
+6/13/2023: Meet and Greet
+
+Migrated from Bitbucket to Github
+
+- TRM-scc-and-sswc: For future use (corrosions near the seam of the pipes)
+- TRM-ec: external corrosion
+- TRM-tpd: third-party damage
+- TRM-ML: Don't need to worry about yet
+
+
+Data loading: use SQL because that's where they are saved
+
+- Some Statistical modeling using R
+- Python to process the data
+
+Who collects the data (Risk SQL server)?
+- Engineer on each threat chair team collect data, give to Gordon Ye's team gathering
+  and puts data into the server
+    - Ask their GIS people about how data is processed
+- Collected from different teams
+  - Inline inspection data (use as ground truth) -- this is good
+  - Geographic description, population description
+  - Pipeline properties (in different years, the survey numbers are inconsistent)
+- Survey (multiple GIS teams) and Marketing teams has better data?
+- Reach out to threat chair about questions of specific data
+  - Given a column name, how to find threat chair
+  - Has documentation on all the data sources
+
+Code Commit process:
+- Jackson Lane (on Gordon Ye's team)...but not much code commit process
+
+Usage:
+- Models still under development. Provide ad-hoc analysis and risk scores for areas
+- Compare old-risk model vs. ML model -- need to use ArcGISPro to visualization
+
+Old risk model:
+- Technical information library: td-4810p-01
+- Risk run: Annual process (March/Apr) -- gather data/spatial join, run data through models
+            and get risk scores in November. Present to threat-chairs for them to make "gut-check"
+            decisions.
+  - If risk scores and the threat-chairs don't agree with each other, they change the parameters
+    to fit their speculations. The quantitative models were only there for compliance purposes.
+
+Goal:
+- Want to actually build accurate predictive models
+- Be confident in the model without too much validation experiments..
+
+Problems:
+- Bias to push risk down...if risk high will need to do inspection
+- Engineers have more control, and physical check is very costly, so how to validate?
+- Why run model only once a year? Because data processing is too slow
+  - Data collection = 2 weeks
+  - Geographical alignment (need to align data within 5-10ft)
+  - All done on local desktop/laptop
+
+Performance comparison:
+- Train/validate/test ML model with 2021 data, and compare against old data
+- Model training done on local computer
+
+Foundary:
+- Electric side: 15minute meter data
+- Can do GeoJSON but not ArcGIS stuff yet (different data format)
+- PGE-Palantir repo (link??)
+
+
+Notes:
+- Pipeline books
