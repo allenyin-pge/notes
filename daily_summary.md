@@ -407,6 +407,90 @@ After American Gas Association (AGA) meeting, PGE indicates initiative to evalua
 
 ## Gordon's road map document
 
+Identifies chains of dependent challenges that needs to be addressed:
+1. Low coverage of piggable pipe due to the large proportion of low operating stress pipelines and pipelines designed under vintage standards in the transmission system;
+    - missing asbuilt records and unrecorded construction variances in past installations create additional gaps of knowledge. This contributes to:
+2. Insufficient coverage of pipeline condition data, e.g. pipeline defects, coating condition, vintage construction features, pressure or gas quality upsets, etc. This contributes to:
+3. Overly conservative logic in Risk and Threat algorithms in order to meet code compliance (includes assumed data values). This contributes to:
+4. Overly large commitments for assessment and mitigation projects, due to larger mileage of assets and shorter assessment intervals.
+    - This means more budget than optimal levels are consumed by compliance work.
+5. Missed opportunity to mitigate pipelines with the highest likelihood of repeating a catastrophic event, due to lack of resources and team bandwidth to investigate and collect data on these pipelines.
+
+
+Focuses on the following improvement areas:
+1. Data improvement
+2. Predictive model to fill data gaps and focus data collection
+3. Calibrate, validate and develop models using data-driven approaches
+4. Make LOF models more data-driven (ok)
+5. Use leaks vs. rupture boundaries to inform inspection and assessment recommendations.
+
+> In the current TIMP model, missing data are often assumed to have the worst value while other missing data (e.g. pipe that was never assessed and therefore have no
+defect indications) are treated as lower risk.
+
+Provides easy problem of interpolation/similarity/regression-based approaches here to fill missing data.
+
+> Removal of SME-driven weights for those threat models that have them will
+require replacing these weight-driven models with mechanistic simulation
+models (causal model).
+
+Knowing causality is enough to fit data-driven models, simulation or not. Might be easier to just the existing dataset. Having existing fault-tree structure narrows the total number of factors and reduces overall data need (i.e. we don't need to do too much variable selection). Similarly, fault-trees seem easily mapped to decision tree classifiers ([ref1](https://ieeexplore.ieee.org/document/1559584), [ref2](https://doina.net/pubs/QEST18-Nauta.pdf) learns causal fault tree as decision tree, [ref3](https://www.sciencedirect.com/science/article/pii/S0957417422023636) learns fault tree from time series data)
+
+> Realistic risk reduction values can be calculated by comparing asset risk levels before and after repairs using an accurate risk model, this will properly account for benefits of older assessment projects. These risk reduction results can then be utilized to build predictive models to forecast future mitigation effectiveness, which are expected to vary depending on [...]. These predictive models of
+mitigation effectiveness are essentially another type of similar pipe models.
+
+Yes, this is good -- now actually learning from past data instead of overfitting model every time on current iteration of data.
+
+> Probabilistic risk models produce probabilistic output from P0.1 to P99.9. This means for the worst 0.1% of the time (i.e. once every 1000 years) the risk will be at the value of P99.9, but on average the risk value will be at P50.
+
+It's a bit unclear what kind of probability interpreation this is using. Do the risk models output the "likelihood" of failure? The frequentist interpretation is that if we sample this pipeline 100 times (year), 99 times it will show failure. If 0.1%, then out of 1000 times, 1 time will show failure.
+
+What does it mean to say "on average [a pipe's] risk value will be 50%"? It means if we sample ALL pipes, 50 times out of 100 ALL of them is bad? Or that half of all pipes are expected to be bad at any given time?
+
+I think he means the former, which indeed doesn't make much sense. Maybe the interpretation should be, if we pick a pipe in random, and sample that pipe 100 times, 50 times it would be bad.
+
+> Due to the far lower safety, reliability, and financial consequence of leak events compared to ruptures, [...leaking] pipeline is more effectively managed by a program more similar to the DIMP rule, with assessment or inspection strategies more targeted towards the cause and consequence (e.g. leak survey
+and repair) instead of non-effective and costly defect assessment and mitigation work such as strength testing, inline-inspection, or excavation.
+
+Interesting to know! Leak mitigation strategy are different and cheaper than rupture mitigation strategy!
+
+__Prioritization strategy__ -- This is a very useful and insightful section:
+1. "Threats impactful to TIMP assessment cycles and mitigation programs are top priority. This includes IC, SCC, SSWC, and Manufacturing threats. In particular, improvement items that are highly impactful to threat ID mileage of these 4 threats are the highest priority" --> This follows the rationale that by reducing assessment and mitigation cost, the saved resources can be leveraged elsewhere for improvements.
+3. "Feasible data improvements should be done before building predictive / machine learning models since the latter activities require good data in sufficient quantities. Very small datasets will render such model development efforts infeasible" --> How would you know when it's done? Dataset size probably sufficient...and can use simple models
+
+Focus areas for 2021-2022...what's the status of these things?
+
+__Suggested KPI__ -- Some seem weird:
+1. "Number of threat mileage reduced (or changed) compared to year over year for threats impacting the TIMP portfolio (IC, SSWC, SCC, M)" --> the model can just depress the number of threat mileage regardless why to fulfill this metric.
+2. "Number of projects impacted by annual result changes that are already scoped" --> This may assign more weight to previous risk score to fulfill this metric.
+3. "% of system representing a leak risk vs % of system representing a rupture risk" --> Model can bias outputting everything as a leak risk instead..
+
+WTF is "ANAGRAM"?!?
+
+
+
+## The need for causal models?
+
+Most ML models are correlative, and correlation does not imply causation. For risk assessment and mitigation, is this needed?
+
+This [article](https://blog.ml.cmu.edu/2020/08/31/7-causality/) gives a great overview of the problems faced in casual inference. Notably, __selection bias__ is something we encounter in pipeline assessment. For example:
+1. We might observe through pipe dig-ins that high leak pipes often has small internal corrosion. And we might conclude that small IC is predictive of high leaks.
+2. However, it might be that pipes with large internal corrosion have all been replaced -- therefore pipes with high internal corrosion is missing from our dataset.
+
+How to treat selection bias? Good [reference](https://www.auai.org/uai2016/proceedings/papers/305.pdf).
+
+Tools for causal discovery includes:
+1. Randomized experiments: Usually performed in science...but expensive and impractical for pipelines.
+2. Conditional independence constraints...a bit vague to me
+3. Constrained functional causal models: Compare the residual-covariate dependence for `y~X` and `X~y`. Seems convenient.
+
+But an even better method that incorporates variable selection and allows flexibility of correlative-ML algorithms is the [knock-off method](https://arxiv.org/abs/1610.02351) -- this is a very promising method for doing causal discovery!!
+
+Even more information about the [knockoff method](https://web.stanford.edu/group/candes/knockoffs/index.html).
+
+Import to note, and very understated in ML community:
+
+> Finally, we underscore that to accurately perform causal inference, one often needs to rely on background knowledge. Indeed, data alone is never sufficient to understand whether all the necessary confoundings are included in the dataset or what regime of domain adaptation is present in the problem at hand. It is only an expert in the field who can competently answer these questions. Thus, we emphasize the critical importance of collaboration with field scientists when performing causal inference.
+
 ## TODO:
 (In order of importance)
 
