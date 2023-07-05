@@ -502,6 +502,67 @@ Import to note, and very understated in ML community:
 1. GIS training
 4. Run ML models with current data
 
+# 7/3/2023
+
+## Takeways from conversation with Gordon
+
+### Things I didn't ask, but should try anyways
+
+Risk model presentation:
+- Distribution of LOF, can also plot on map
+- Distribution of overall risk (LOF x COF), also plot on map
+- Show changes of (1) and (2) compared to previous year
+  - Emphasis on regions of high changes
+  - Areas the LOF or Risk SMEs are surprised about
+
+## Probability of Exceedance (POE) models
+
+How to validate, there is a lack of data usually.
+
+__Learn from insurance/catastrophe modeling [approaches](https://www.youtube.com/watch?v=xMldVmXNJkk&list=PL_tuxWayNmw_ZSf8zbgDvuN_efVTs1DJc&index=13)?__
+
+Pipeline CE as insurance -- evaluate risk, mitigation/assessment as premium. Want to minimize premium and total cost.
+
+- Don't have good data to assess correct risk (and therefore pricing model)
+- Catastrophe models:
+  - Not predictive/forecast models
+  - Use statistics
+  - All make different assumptions (SME-driven..)
+  - Allow for user-defined views of risks
+
+- Before PC age, insurance industry lacked usable risk accumulation information (similar to our pipeline risk accumulation now..)
+  - The first US hurricane model predicted billion dollars loss in South Florida, but the SMEs didn't think so and ignored it, around 1980s.
+  - Models weren't taken seriously until early 1990s when catastrophes happened.
+
+- Basic of catastrophe models:
+  - __Stochastic event set__: Set of discrete events covering all important combinations of location, size, and other pertinent characteristics of the peril in question, as well as the probability of each event.
+    - Account of all locations that are impacted by peril of interest.
+    - Have sufficient number of events to cover all possible sizes and intensities that are possible in a given location (Cat model: hurricane 5 in Fl, pipeline: soil resistivity values in SF?)
+    - Consider the probability of an event occuring (annually)
+    - Have enough events to produce loss results that are geographically consistent and statistically stable (i.e. hurricane risk for two close locations around the coast should be similar; erosion risk for two similar pipeline locations should be similar)
+  - Intensity calculation: 
+    - Be based on established physics of the hazards being modeled (causal models)...if available, good
+  - Damage estimation -> COF
+  - Loss evaluation
+
+Stochastic event simulation not very applicable to pipeline risk modeling...
+- Why can't we model each rupture/leak event, and then use it that way?
+  - It reduces down to the same as risk probability calculations. Problem is that these are sparse data points and probably not available on the scale of leak->rupture..?
+
+__Probability of Exceedance [approaches](https://www.youtube.com/watch?v=928a8sH-NRg)__
+
+- Given events, can build up exceedance model!
+  - Record N observations of some events (e.g. pipeline rupture...at specific location needed?)
+  - Rank from most consequential to least
+  - Caculate exceedance probability by `EP = rank / (n+1)` for all events (follows the power law generally, plotting `EP ~ consequence`).
+    - DO this if not possible to compile actual probability of occurence from data.
+
+- How does knowing probability of `x`-cost event help? It means we can spend money less than the expectation of calculated loss for mitigation, or consider doing mitigation at all if EP is small.
+
+- Model building:
+  - How to backtest model/simulation when historical data wasn't available?
+
+
 
 
 
