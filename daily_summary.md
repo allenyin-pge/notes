@@ -563,6 +563,24 @@ __Probability of Exceedance [approaches](https://www.youtube.com/watch?v=928a8sH
   - How to backtest model/simulation when historical data wasn't available?
 
 
+# 7/5/2023
+
+Mainly worked with filling out details for TIMP-CE Roadmap [doc](./TIMP-CE-Roadmap.md). Need to fill out the details.
+
+#TODO:
+
+1. Fill out planning document details
+  - Talk to Brian Patrick about his specific threat SSWC as a first-start for model performance measurement.
+  - (I'm not too convinced we need to do this for every specific threat model, data might be different, outputs should be the same?)
+2. Get Mariner SQL database access
+3. Learn how to run current risk model with database -- try integrate with Foundry? Gordon suggests talking to __Maggie Zheng__.
+5. Read more about SSWC -- official doc and the slides.
+1. GIS training
+4. Run ML models with current data
+
+
+
+
 
 
 
