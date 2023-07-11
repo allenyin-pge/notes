@@ -569,7 +569,7 @@ Mainly worked with filling out details for TIMP-CE Roadmap [doc](./TIMP-CE-Roadm
 
 #TODO:
 
-1. Fill out planning document details
+1. ~Fill out planning document details~
   - Talk to Brian Patrick about his specific threat SSWC as a first-start for model performance measurement.
   - (I'm not too convinced we need to do this for every specific threat model, data might be different, outputs should be the same?)
 2. Get Mariner SQL database access
@@ -578,6 +578,55 @@ Mainly worked with filling out details for TIMP-CE Roadmap [doc](./TIMP-CE-Roadm
 1. GIS training
 4. Run ML models with current data
 
+# 7/6/2023
+
+Recommended reading list by Brian Patrick:
+
+- Shared [folder](\\FFShare01-NAS\RiskMgmt\RISK THEMES\BNPQ\For Allen), prioritize:
+  - SSWC Threat SC meeting DRAFT 9-24 ppt
+  - PHMSA All subfolder, Task 3-1
+- Reading ASME 31.8 (big binder)
+  - non-mandatory appendix A
+  - section on risk assessment
+- San Bruno [report](https://pge-my.sharepoint.com/:b:/r/personal/a1yu_pge_com/Documents/Documents/docs/SanBruno_Report.pdf?csf=1&web=1&e=oSmf5p)
+- Pipeline risk modeling technical information [report](https://pge-my.sharepoint.com/:b:/r/personal/a1yu_pge_com/Documents/Documents/docs/Pipeline-Risk-Modeling-Technical-Information-Document-02-01-2020-Final.pdf?csf=1&web=1&e=d7LhCk) by PHMSA
+
+
+## Other notes
+
+- PRCI and GTI = two best industry funded consortiums
+- PGE=member of PRCI
+- PHMSA regulates us, and does research for changing regulations
+- Publications might be asked by management for retraction because:
+  - If a regulator thinks a method is outside of prescribed in code, then might receive violation and need to do work to prove legitimacy
+  - Without the publication, there's not that scrutiny
+- Changing regulations is slow, need to apply for special permits to do alternate methods.
+- Thirdy-party consultants give credibility to what the operators come up themselves.
+- PHMSA publications are not very frequent, so easier to keep up
+
+## TODO
+
+1. Read all the things
+2. Arrange meeting with Brian to go over approach
+  - Start documentation on the proces.
+
+
+# 7/7/2023, 7/11/2023
+
+Learning about SSWC:
+
+- Causes most associated with welding process
+- Once installed, risk factors similar to other corrosion risks.
+- Sulfur enrichment and sulfide inclusions leading to localized corrosion in the weldment seems to be the mechanism that has the largest supporting evidence.
+- Different factors that can lead to SSWC:
+  - Environment conditions
+  - Steel chemistry
+  - Welding parameters
+- SSWC-related pipe failure ususally happens early in service. Study of 68 SSWC failures saw 70% in 4 years and 90% in 7 years.
+  - Can we assume pipes installed nearby/similar timing to a SSWC has higher risk then?
+- SSWC has high interaction with out threat-modes.
+- SSWC is associated with different welding methods, but usually associated with ERW
+- Can happen at the same time as internal corrosion
 
 
 

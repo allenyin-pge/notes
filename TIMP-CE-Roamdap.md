@@ -1,8 +1,9 @@
-# TIMP-CE Roamdap
+# TIMP-CE Roadmap
 
-Overhauling the entire risk model process is unrealistic, disruptive, and prone to errors. We should insert changes in steps, in modular ways such that improvements to the process and risk models is __incremental__ and __measureable__.
+Overhauling the entire risk model process is unrealistic, disruptive, and prone to errors. We should insert changes in steps, in modular ways such that improvements to the process and risk models is __incremental__ and __measurable__.
 
 The main stages of TIMP Risk Management we should focus on include:
+
 - Data gathering
 - Data integration
 - Model run
@@ -13,15 +14,16 @@ The main stages of TIMP Risk Management we should focus on include:
 
 #TODO: Fill out more details about each stage.
 
-## Toward measureable model improvements
+## Toward measurable model improvements
 
-Any improvements to a process need to be measureable -- ideally we can devise a single metric, or a set of consistent metrics that can measure risk model performance, and which can be compared through time.
+Any improvements to a process need to be measurable -- ideally we can devise a single metric, or a set of consistent metrics that can measure risk model performance, and which can be compared through time.
 
 In addition, model performance metric needs to be able to be validated with collected data.
 
 This set of model metrics need to be agnostic to the model implementation details, and capable of convincing SME of a model's quality.
 
 Examples:
+
 - How about classification based metrics such as precision/recall?
     - They would work for certain risk types where classification data is available. But it's not ideal since adverse events are in general sparse, and our risk models is required to output LOF. We can attach a threshold-based classification stage after LOF and derive classifications. But ideally the performance metric can also be a probability-based metric.
 - What about using amount of predicted rupture events to measure model performance?
@@ -34,9 +36,12 @@ Examples:
 3. Implement and validate -- can we apply this to previous years' models/data combinations?
 4. SME approval/implement in process?
 
-We can take a threat-by-threat approach, before making a generalized method to reduce difficulty and data requirements. Prioritize performance measurement only for threats that inform assessment, for more measureable impact.
+(1-3) Aimed for September currently
+
+We can take a threat-by-threat approach, before making a generalized method to reduce difficulty and data requirements. Prioritize performance measurement only for threats that inform assessment, for more measurable impact.
 
 Overall game-plan:
+
 1. Pick a threat
 2. Make something
 3. Iterate??
@@ -45,12 +50,14 @@ Overall game-plan:
 ## Incremental improvements focused on Validation
 
 A huge time sink is the data input validation stage. Several things we could do:
+
 1. Inherit previous year's validation dataset if no changes occur -- as time goes by, the model coverage improves rather than starting from 0.
 2. When there are new cases (e.g. new code label, or segment with combination of characteristics), focus validation on these set. Essentially, replace random sampling during validation with targeted sampling to save iteration time and increase test case coverage.
 3. Integrate database and validation procedures with Foundry -- to improve model and data tracking
 
 
 The current data integration and validation stage has the following functional steps:
+
 1. Risk engineers check the factors their specific risk depends on have the correct data and is entered according to their interpretation of the model (i.e. scale point assigned correctly). This is done for random sampling of 250 pipeline-segments, with "ground-truth" calculated manually in excel.
 2. After the data is entered into MarinerDB, and the model runs complete, the model results need to be validated.
 3. In this step, the assumption is that the MarinerDB data is already cleaned and correct. 25k random samples (pipeline segments) are picked from the database, and their associated risks are calculated by the risk engineers "manually" in excel sheet.
@@ -76,6 +83,7 @@ We can analyze the possible causes for a pipeline segment's model output to be d
 Suppose in year 1, modelX is calculated as `y = A1 + B1 + C1`, where `y` can be considered as LOF of type `X`, and `A1`, `B1`, and `C1` are risk factors.
 
 The types of data and modeling changes that can impact modelX calculations from year to year include:
+
 - __Substitution__. Ex: In year 2, the name of `A1` has changed to `A1'`. But the model and the meanining of the risk factor doesn't change, in this case nothing needs to be doen to re-use year1's test case.
 - __Numerical__. Ex: For some of the time-dependent factors, the scaling needs to advance. So if say `B1` is in fact `B1(t)`, and has value based on 5 years pipe age in year 1, it would advance to that of 6 in year 2.
 - __Modeling__.

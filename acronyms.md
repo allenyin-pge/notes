@@ -24,3 +24,4 @@
 - IOC: Impacted Occupancy Count
 - SCC: Stressed Corrosion Cracking
 - SSWC: Selective Seam-Weld Corrosion
+- ERW: Electric resisstance welded
