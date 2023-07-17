@@ -262,7 +262,7 @@ __GeoMART__ data requests are typicall for __ILI data__. These data requests are
 Why not unify all data sources in Foundry ontology?
 - There is a push for that, but it doesn't currently handle spatial data very well (opportunity!!)
 
-### _Mariner DB detials_
+### _Mariner DB details_ 
 
 Spatial relationship is encapsulated via "linear referencing", not via absolute positioning such as GPS coordinates. This process:
 - Establish naming conventions for different pipeline route.
@@ -582,7 +582,7 @@ Mainly worked with filling out details for TIMP-CE Roadmap [doc](./TIMP-CE-Roadm
 
 Recommended reading list by Brian Patrick:
 
-- Shared [folder](\\FFShare01-NAS\RiskMgmt\RISK THEMES\BNPQ\For Allen), prioritize:
+- Shared [folder](\\\FFShare01-NAS\RiskMgmt\RISK THEMES\BNPQ\For Allen), prioritize:
   - SSWC Threat SC meeting DRAFT 9-24 ppt
   - PHMSA All subfolder, Task 3-1
 - Reading ASME 31.8 (big binder)
@@ -618,7 +618,7 @@ Learning about SSWC:
 - Causes most associated with welding process
 - Once installed, risk factors similar to other corrosion risks.
 - Sulfur enrichment and sulfide inclusions leading to localized corrosion in the weldment seems to be the mechanism that has the largest supporting evidence.
-- Different factors that can lead to SSWC:
+- __Different factors that can lead to SSWC__:
   - Environment conditions
   - Steel chemistry
   - Welding parameters
@@ -627,7 +627,83 @@ Learning about SSWC:
 - SSWC has high interaction with out threat-modes.
 - SSWC is associated with different welding methods, but usually associated with ERW
 - Can happen at the same time as internal corrosion
+- "Because sulfide inclusions are known to induce rapid localized
+corrosion, it is logical to expect them, if present in the FZ and HAZ, to play a significant role in
+SSWC as well"
+- __Micro-crevices__: can be formed at lack of fusion defects within the FZ. Once formed and exposed at the metal surface, traditional occluded/concentration cell crevice corrosion mechanisms are then invoked to explain SSWC initiation and propagation.
+  - It has also been proposed that sulfide inclusions create micro-crevices due to a difference in thermal expansion compared to steel
+- The mechanism of SSWC may vary depending on:
+  - the environment that the pipeline is exposed to,
+  - the steel that was used to fabricate the pipe,
+  - and the welding parameters used.
+  - A combination of mechanisms may also occur in which one or more processes are taking place simultaneously or in sequence.
+  - The end result is the same --> "formation of long, V-like defects that can act as precursors for other failure modes".
 
+__Environmental variables__:
+
+  - Higher rate at high conductivity environments (e.g. brine)
+  - Higher rate at higher oxygen concentration
+
+- Test durations can be important to identify SSWC mechanisms - depending on environment factors and weldment material, it can transition from being cathode to anode.
+
+__Sulfur content__:
+
+Though the steel sulfur content is critical and lower sulfur levels are beneficial, there may not be a critical level below which immunity to SSWC can be assumed with confidence.
+
+Refinement of the sulfide inclusions seem to be the mechanism through which post-weld heat treatment decreases SSWC susceptibility, but this effect is temperature dependent though!
+
+__SSWC Mitigation__:
+
+- Inhibition of SSWC susceptible pipe is possible but confirmation testing and follow-up  monitoring need to be conducted to ensure unexpected acceleration of SSWC is not taking place.
+- Presence of a protective coating and effective cathodic protection can mitigate SSWC, there is a paucity of reported results that confirm these
+facts nor is there reported information quantifying the minimum level of CP needed
+
+## SSWC Model
+
+- Baseline susceptibility: Weights are ranked in order of `mainline coating > environment > cathodic protection` -- does that actually make sense in terms of mechanism?
+- Mitigtation factor adds hydrostatic retest, ILI, and direct examination. Other than direct examination, how do the other two factors help?
+
+## SSWC Steering Committee meeting
+
+[9/24/2022](file://ffshare01-nas/RiskMgmt/RISK%20THEMES/BNPQ/For%20Allen/sswc/SSWC%20Threat%20SC%20Meeting-DRAFT%209-24.pptx):
+
+- Megarule, 192.917 (e): Identification of any cracks (including SSWC) on a covered pipeline segment that could adversely affect the integrity of the pipeline, the operator __must evaluate and remediate as necessary, all pipeline segments (covered or uncovered) with similar characteristics__.
+
+
+# 7/12/2023
+
+Notes about SSWC and EC from Brian Patrick..
+
+- For inspection, digging a hole cost ~$350K. Running ILI: $3-5MM/mile
+- For SSWC, would be nice to know the pipe chmeistry and fabrication year, but don't have that info.
+- SSWC model right now essentially same as EC model, with "wildcard susceptibility".
+- SSWC takes time to show up. The pipes were laid in ~1980s, it takes time for coating to break down, and environmental factors to happen.
+- Very little SSWC data: ~20 findings. Compared to ~2000 miles inspection data, 3000 miles pipeline potentially susceptible (?!)
+- High fidelity inspection data is ILI, but different for the different threats:
+  - For EC: Magnetic field on axial direction
+  - For SSWC: Old EC ILI tech cannot find it, so only has SSWC capable data since recent years.
+- Overall, EC has most data.
+- WROF: Lots of field data, geoscience team identifies pipelines for remediation. Quality of data is higher.
+- SCC and SSWC have similar amount of positive data.
+- POE models: Knowing what we have in the ground, extrapolate corrosion rates. But if we suspect something is bad, it's mitigated, so never have any adverse events, and is difficult to validate.
+
+
+# 7/17/2023
+
+More reading notes...
+
+## [Effectiveness of hydrostatic testing for assessing integrity of ERW and flash-weld pipe seams](file://ffshare01-nas/RiskMgmt/RISK%20THEMES/BNPQ/For%20Allen/sswc/PHMSA%20All/Task1_2-Effectiveness_of_Hydrostatic_Testing-KOLOVICH.pdf)
+
+The evidence on this is actually mixed. Hydrostatic testing can detect and subsequently mitigate these seam corrosions, but it's also possible for them to accelerate structure integrity issues, causing pipes to fail shortly AFTER the test. Combination of ILI and hydrostatic testing seem to be the best, as they can complement each other.
+
+From the doc, hydrostatic testing can be an effective assessment method if:
+
+- The test intervals are short enough to prevent in-service failures between tests in pipelines where a time-dependent seam-integrity-degradation mechanism exists such as pressure-cycle-induced fatigue. __This requires a reliable model for predicting defect growth.__
+- No features exist that could cause faster growth rates than those that the test intervals are based on. Features such as dents or large cracks in unusually tough or strong materials can result in faster growth rates than one might anticipate in the absence of dents and when the properties of the material are close to the expected values. These features can possibly be detected by the combined usage of ILI and hydrostatic tests;
+  - ILI to detect stress-concentrating features or large cracks in resilient materials and
+  - hydrostatic testing to prove that no injurious features were missed.
+- The test-pressure-to-operating-pressure ratio is as high as possible to increase the safety margin and reduce the possibility of a pressure reversal occurring following the test.
+- The possibility of a small leak occurring after the test is recognized and mitigated by other means since short, through-wall seam flaws may not leak during a test, nor can they be reliably detected by ILI.
 
 
 
