@@ -705,10 +705,163 @@ From the doc, hydrostatic testing can be an effective assessment method if:
 - The test-pressure-to-operating-pressure ratio is as high as possible to increase the safety margin and reduce the possibility of a pressure reversal occurring following the test.
 - The possibility of a small leak occurring after the test is recognized and mitigated by other means since short, through-wall seam flaws may not leak during a test, nor can they be reliably detected by ILI.
 
+## Data validation 
+
+- GIS operations might not be the most time-consuming part.
+- Filling in data columns with the correct numbers from disparate data sources, while following some logical rules is the most time consuming part.
+  - My take: Excel is not really the best tool for the job...
+- Steven: Automating kinda defeat the purpose of manual validation in the first place..
+- What are the differences between "risk side" and "threat side"?
+  - "Threat side" -- threat identification process, determining if a pipeline should be assessed for a threat.
+  - "Risk side" -- mostly used for prioritizing projects, more granular.
+  - Decision process is: threat-identification is done no matter what.
+  - Assessment is driven by scheduling due dates.
+  - Risk score is only used for some things..threat identification process is the most important part.
+- Basically, risk score for prioritizing additional projects after threat ID is done, in bursts (to determine line upgrades for ILI, etc)
 
 
+# 7/18/2023
+
+## Discussion with Ian about model benchmarking
+
+How to measure pipeline health? Ex: in the context of external corrosion:
+
+1. Use absolute value of wall-loss due to corrosion?
+  - Counter: 10mm to 5mm vs. 40mm to 20mm, which is of worse health?
+2. Use percentage of wall-loss due to corrsion?
+  - Counter: 50% corrosion, one is 10mm to 5mm vs. 40mm to 20mm, which is of worse health?
+
+Hard to decide naively. For ILI, 4810P-11 Table 1 gives some critieria, should probably derive from there. This takes into account of factors such as maximum operating pressure, etc.
+
+Another problem is taking into account of "potential increase" into pipeline health when calculating current pipeline health...
+
+## Potential second project
+
+Sensitivity analysis on what variables/data sources affect the model output?
+
+Goal -- to inform future data collection project decisions.
+
+Presentation about model benchmarking -- next Wed, prep on next Tues?
+
+# 7/19/2023
+
+Foundry ontology -- Devon Yates, Gina Nuss...useful to ask them specifically about:
+
+1. Ontology model validation: How do they know their models are correct?
+2. Schema changes: How do they handle data changes?
+
+# 7/20/2023
+
+Anaconda installation:
+- Install anaconda from the official website. PGE [wiki](https://wiki.comp.pge.com/display/DAF/Install+Python+Anaconda#InstallPythonAnaconda-InstallationfromAnaconda'sWebsite(NoLARrequired-recommendedtogetlatestversion))
+- Configure anaconda package installation, following PGE [wiki link](https://wiki.comp.pge.com/display/DAF/Install+New+Python+Packages)
+  - Note that on `conda update anaconda`, may run into problem where `_ctypes: dll cannot be found` error. In that case go to the Anaconda installation folder, then go to `Library/bin` , then do `mv .\ffi.dll.c~.conda_trash ffi.dll` to change the file name.
+  - Also see more about the error [here](https://github.com/conda/conda/issues/12531)
+- Now we can indstall packages. I use pytorch, so `conda install -c conda-forge pytorch` should work.
+- Update powershell and vscode to have conda enabled, following [this](https://www.scivision.dev/conda-powershell-python/). In conda prompt, do:
+  - `conda update conda`
+  - `conda init`
+- Now all the powershells will have it enabled, and you won't have to mess with stupid settings in vscode, for example.
 
 
+# 7/24/2023
+
+Getting ready for second round of draft proposal. Need to answer two key questions:
+
+1. How to rank ground-truth pipeline healths?
+  - Currently have ILI inspection chart for ranking need for assessment. But is there any other established sources that are more fine-grained? Currently there are 4 tiers (within each `%SMYS at MAOP` level)
+2. ILI data bais toward bigger, piggable pipes. What can we say about those pipes' health relative to non-piggable pipes? Do we care?
+
+
+## ILI deep dive
+
+Based on 4810P-11 document:
+
+### Pre-assessment
+
+Data collected include: GIS data, PFLs, transmission-drawings, as-built jobfiles, district and division maintenance records, and previous TIMP assessments.
+
+(_Nothing relevant for ground-truth ranking.._)
+
+Threats affecting specific pipe segments are identified (threat-ID process)
+
+
+### ILI
+
+Specific inspections:
+
+- Clean the pipeline
+- Geometrically inspect the pipeline for dents or other geometric anomalies where geometry inspection technology is available.
+- Inspect the pipeline for external corrosion, internal corrosion, and other metal loss (ML) anomalies.
+- Map the pipeline to assure correct alignment, ability to locate anomalies, and ability to identify pipeline bending strains
+- Inspect the pipeline for any additional threats as assigned by the TIMP Risk Team.
+- Obtain ILI vendor final report that will locate and quantify the severity of damage to the pipe wall and identify other anomalies -- (_so get rankings from ILI vendor final report_??)
+- Create a dig plan which addresses both the short-term integrity concerns, and also validates the ILI results.
+
+Specs available from ILI:
+- __Metal loss__: The required anomaly sizing must be specified to determine an acceptable inspection. Inspection must be performed to collect data on deformation to include dents, out-of-roundness, or other geometric features that impact the integrity of the pipeline. Orientation by o’clock or degrees is required to be able to report anomaly location relative to the critical 8 o’clock to 4 o’clock position on pipe.
+- __Geometric feature accuracy__:
+  - The required anomaly sizing must be specified to determine an acceptable inspection. Inspection must be performed to collect data on deformation to include dents, out-of-roundness, or other geometric features that impact the integrity of the pipeline. Orientation by o’clock or degrees is required to be able to report anomaly location relative to the critical 8 o’clock to 4 o’clock position on pipe.
+  - When applicable and where possible, the ILI tool will identify the orientation of the seam weld.
+- __Crack Tool__ detection..
+
+### Direct Examination
+
+Happens after actual ILI using ILI tool, include:
+
+- Review ILI data
+- Development of excavation and repair plan
+- Excavation and examination of selected pipeline anomalies
+- Validation of ILI vendor reporting accuracy
+- Reporting validation data to ILI vendor
+- Data from direct examinations is used to define pipe section conditions, repair requirements, and to complete PG&E reporting.
+
+What kind of ILI validation data? Can ILI vendor supply some time of pipeline health ranking?
+
+__ILI Final Report__
+
+The final report must be integrated with the applicable geometry, metal loss, and any other ILI tools used, addressing the applicable threats (i.e., internal corrosion, external corrosion, mechanical damage, stress corrosion cracking [SCC]) per the ILI specification.
+
+Useful things:
+- Feature characterization: feature classification (anomaly, component,
+nonrelevant indication, etc.), depth or depth range (percent wall thickness
+and/or depth measurement, percent of outside diameter or measurement of
+deflection from concentric pipe, percent of expansion, or reduction of cross
+section), length, width, and position through wall (ID, OD, midwall).
+- Inspection results must include anomaly or feature identification and dimensions for which the performance specification has been qualified and results validated. Other features and anomalies should be included but must be identified as “unqualified.”
+
+__Immediate Anomalies__
+
+- ILI vendor notifies discovery of immediate anomalies fitting critiera of Table 1
+- ILIE must respond to these immediate anomalies via pipeline pressure reduction
+- Signal data for reported immediates will be reviewed by third-party ILI data analyst
+
+__Cracks__: For crack and crack-like anomalies identified by Circumferential Magnetic Flux Leakage (MFL-C), EMAT, or other crack tools, refer to Utility Procedure TD-4810P-25, “In-Line Inspection Crack Acceptance,” to determine if any anomalies meet criteria in ASME STP-PT-001. (_Another source of ground-truth rating!_)
+
+__Post-ILI review__: The ILIE hosts a meeting with key stakeholders to share lessons learned from the ILI assessment, including a summary of the overall pipeline conditions and areas of significant interest or concern.
+
+__Excavations__: 
+  - Excavating the anomalies and collecting data at the identified locations
+  - Comparing the field data with ILI data <---_How is this done?_
+  - The data to be collected for Form TD-4810P-18-F01 is identified in Utility Procedure TD-4810P-18, “Direct Examination.” 
+
+__Evaluating Predicted Failure Pressure__:
+  - Predicted Pf – Internal and External Metal Loss: Calculate based on some formula on interactions...how good is this model?
+  - Predicted Pf – Cracks and Crack-Like: Apply procedure in TD-4810P-25..
+
+__ILI Run Validation__:
+- See API 1163 ILI Verification Report issued by Kiefner for further guidance
+- Level 1-3 validation...is this done for ALL the spots manually?
+
+## ILI Take-aways...
+
+- Need to understand what's in the following reports and how the data there can be used to compile ground-truth pipeline healthy:
+  - ILI vendor final report
+  - ILI validation report
+  - Excavation examination ILI data comparison
+  - ILI Run validation (API1163)
+
+Additional resources to read: Crack anomaly procedure **TD-4810P-25**, Excavation data collection **TD-4810P-18**.
 
 
 
