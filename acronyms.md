@@ -25,3 +25,5 @@
 - SCC: Stressed Corrosion Cracking
 - SSWC: Selective Seam-Weld Corrosion
 - ERW: Electric resisstance welded
+- EMAT: Electro-magnetic acoustic transducer (ILI method) -- gives SCC info
+- MFL: Circumferential magnetic flux leakage (ILI method)

@@ -863,6 +863,33 @@ __ILI Run Validation__:
 
 Additional resources to read: Crack anomaly procedure **TD-4810P-25**, Excavation data collection **TD-4810P-18**.
 
+Also [RSTRENG](https://technicaltoolboxes.com/rstreng/) as a way to calculate "failure pressure" and "remaining pipeline life" based on ILI data...why can't this just be the ground-truth metric then???
+
+# Week of 7/31/2023
+
+Switching to weekly updates because more implementation now..
+
+## Foundry data access
+
+Even Lin and Steven Hui have previously built connection in Foundry allowing it to access tables from the marinerDB. This is apparently not working anymore (connection setting).
+
+To set up Foundry access, have to do a few MEA requests...so far following [this page](https://wiki.comp.pge.com/display/ARAD/Request+Access+to+Palantir+Foundry), requested MEA for:
+
+- data scientist
+
+Need to then ask Vos Jorgen (JHV3) to restore access to these MarinerDB connections.
+
+Even's data source link in [Foundry](https://damask.palantirfoundry.com/workspace/compass/view/ri.compass.main.folder.d8cecb4d-c224-4bf9-b764-e5e06abf0d7b)
+
+## Prototype model metric:
+
+1. Update the plan, see [here](https://pge-my.sharepoint.com/:w:/p/a1yu/EfobQEi_deVBqQ_aCYOyUUgBCuQU4wNKtz6y32zTly181A?e=iXnk1y)
+2. Get access to MarinerDB, take the relevant columns
+3. First pass on rank correlation
+
+
+
+
 
 
 
