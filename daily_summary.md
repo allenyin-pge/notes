@@ -871,6 +871,122 @@ ILI Vendor report [location](\\RcShare03-NAS3\TIMP_Library\ILI\Traditional\L-300
 - EMAT would have SCC info
 - SSWC is done with MFL -- axial instead of circumferential (MFL-C vs. MFL-A)
 
+
+# 7/26/2023
+
+[Good primer on pipeline cracks](https://www.rosen-group.com/global/solutions/services/pipeline-cracks#lackofpenetration)
+
+__TD-4810P-25: ILI Crack Acceptance__
+
+Guidance on response requirements for Pacific Gas and Electric Company (PG&E or Company) crack detection. The use of this utility procedure is restricted to axially oriented planar flaws under internal pressure loading
+
+## Collect data
+
+Include: pipe diameter, wall thickness (WT), grade, and fracture toughness, maximum allowable operating pressure (MAOP), and historical operating pressures
+
+Fracture toughness:
+- The most commonly available data is Charpy V-notch (CVN) data
+- Determine CVN value from:
+  - CTOD toughness value from metallurgical destructive testing
+  - Conservative toughness value based on ongoing material properties verification process that meets requirements of 49 CFR §192.607 requirements
+  - Conservative toughness value based on notification to the California Public Utility Commission (CPUC) and U.S. Department of Transportation (DOT) Pipeline and Hazardous Materials Safety Administration (PHMSA) under provisions of 49 CFR §192.18
+  - Use assumed toughness values from Table 1 (Seam Weld Fracture Toughness Assumptions) -- units for toughness is "ft-lb" -- this is a unit of energy..
+- When threat interaction from cyclic fatigue caused by internal operating pressure has not been ruled out, the ILIE must confirm that a fatigue analysis has been conducted
+
+## Determine Critical Flaw Curves
+
+Purpose is to generate critical flaw curves for the base metal and longitudinal seam weld for each of the combinations of pipe diameter, WT, grade, fracture toughness and MAOP identified in the preceding step.
+
+Two failure types:
+  - __by yielding__: flow-stress-dependent failure, evaluted by B31G and RSTRENG evaluate failure by yielding.
+  - __by fracture__: toughness-dependent failure, evaluated by log-secant method.
+
+  Various fracture-mechanics analysis methodologies can be used to calculate the failure stress of a crack as a function of crack dimensions, pipe dimensions, and pipe material properties.
+  - The Battelle method (log-secant): for low strength (SMYS up to 60ksi), limited to pipe body and welds with CVN > 15ft-lb.
+  - CorLAS, a proprietary computer software package developed and owned by DNV GL. This methodology is a widely accepted analysis method for flaws in modern and vintage pipe materials.
+  - MAT-8 is an excel-based computer software package developed through PRCI and ASME which applies a Failure Assessment Diagram (FAD) approach. __Most rigorous for axial flaws__ developed through FEA.
+
+The ILIE must determine the family of theoretical flaws that may survive at the following pressure levels: 1.1 MAOP, 1.25 MAOP, and 110% SMYS when possible. Crack models are used to calculate critical flaw curves, relating failure pressure to crack length and depth.
+
+![critical-flaw-1](./assets/crack_critical_flaw_curves.png)
+![critical-flaw-2](./assets/crack_critical_flaw_curves2.png)
+
+The critical flaw curves are used to identify which anomalies reported by an ILI are to be excavated, into 4 cateogories -- this is again a way to rank pipeline health!
+
+## Perform ILI
+
+The purpose of this step is to gather crack related data on the pipeline that can then be analyzed by the ILI vendor and acted upon by PG&E.
+
+Data collected include crack characteristics, which then can be plugged into the critical flaw curves.
+
+## Evaluate prelim or final ILI vendor report
+
+Within five days of receipt of either a preliminary or final ILI vendor crack inspection report, the ILIE must take the following actions to determine whether a pressure reduction is needed (either immediately, or before excavation of indications).
+
+The ILIE must review any reported crack or crack-like indications:
+- Determine category of anomaly
+- Investigate whether a repair has previously been completed at anomaly location(s) -- if yes, make sure it was appropriate.
+- Determine the need for an immediate pressure reduction.
+- Determine the need for a pressure reduction before the start of excavation
+- Determine Interaction of cracks based on the following or an approved alternative
+
+## Determine required excavations
+
+Depending on the category of the reported anomalies, immediate and/or scheduled excavations may be necessary. Timing requirements depend on the expected category of the associated anomalies. Crack growth and __remaining life__ could also drive the need for direct examination and repair.
+
+## Conduct integrity digs
+
+The purpose of this step is to identify any reported anomalies that require excavation because they potentially pose a threat to the integrity of the pipeline.
+
+All cracks or crack-like indications >70% through wall must be considered Immediate Anomalies and excavated, regardless of calculated failure pressureA
+
+Steps (Many data is collected -- good for modeling and groud-truth confirmation..maybe on cracked parts)
+- Non-destructive examinations
+- After suitable cleaning, each target external anomaly is inspected using magnetic
+particle inspection (MPI),
+- When a probable crack field (e.g., SCC) anomaly is found, and when practicable,
+consider inspecting the entire pipe joint and a portion of the upstream and downstream
+joints
+- Ultrasonic shear wave, phased array ultrasonic inspections, or other methods
+approved under Utility Procedure TD-4810P-18 may be used to estimate the depth of
+linear anomalies that are identified in the field or identify connected anomalies
+- For comparison with EMAT data, in-the-ditch crack lengths are determined by the
+depth at which the crack meets the EMAT performance specification minimum
+detectable depth, or 25% through wall, whichever is less.
+- Additional inspection, assessment, or repair could apply if linear indications are
+observed to interact with metal loss, deformations, or welds
+
+## Validate the inspection, Accept final inspect result
+
+After the dig based on ILI results, need to validate with manual inspection, to verify based on:
+- Defect characterization
+- Defect sizing accuracy
+- Length sizing accuracy
+
+
+Too much discrepancy may trigger a re-run of ILI (perhaps tool tolerance not accurate?)
+
+Before rejecting an inspection, the engineer must consider all sources of errors:
+- Location errors
+- False calls (some pipe features can be confused with defects)
+- Missed calls: pipeline features masked defect
+- Misidentified calls: Smaller anomalies can be misidentified (corrosion mis-id's as crack fields)
+- Sizing errors: Can inidicate ILI tool setup error, analysis process or defect geometry
+
+Reasons to reject inspection:
+- Too many flaws outside the tool tolerance
+- Lack of detection of flaws that are integrity threats
+- High misidentification of flaws that are material to pipeline integrity
+
+## Account for the potential effects of future growth
+
+Different methods to take into account of future crack growth -- if the model says the crack will become critical before the next inspection, then need to move this defect into the current cycle of mitigation (or schedule it earlier):
+
+> The ILIE must consider the potential for crack growth in determining which ILI calls are to be excavated and repaired (if required) before the next scheduled reassessment, and in recommending a reassessment interval that ensures no failures before the next reassessment
+
+The data on the next assessment can be used to validate models!!
+
+
 # Week of 7/31/2023
 
 Switching to weekly updates because more implementation now..
