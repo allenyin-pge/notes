@@ -865,6 +865,12 @@ Additional resources to read: Crack anomaly procedure **TD-4810P-25**, Excavatio
 
 Also [RSTRENG](https://technicaltoolboxes.com/rstreng/) as a way to calculate "failure pressure" and "remaining pipeline life" based on ILI data...why can't this just be the ground-truth metric then???
 
+ILI Vendor report [location](\\RcShare03-NAS3\TIMP_Library\ILI\Traditional\L-300A\MP450.83-502.12\2021\ILI Vendor Report)
+
+- Want the MFL vendor report,
+- EMAT would have SCC info
+- SSWC is done with MFL -- axial instead of circumferential (MFL-C vs. MFL-A)
+
 # Week of 7/31/2023
 
 Switching to weekly updates because more implementation now..
@@ -886,6 +892,49 @@ Even's data source link in [Foundry](https://damask.palantirfoundry.com/workspac
 1. Update the plan, see [here](https://pge-my.sharepoint.com/:w:/p/a1yu/EfobQEi_deVBqQ_aCYOyUUgBCuQU4wNKtz6y32zTly181A?e=iXnk1y)
 2. Get access to MarinerDB, take the relevant columns
 3. First pass on rank correlation
+
+## MarinerDB inspection
+
+For now, use the MSFT SQL Server management studio (requested through IT) to inspect the data.
+
+Note MarinerDB database info given were:
+
+```
+Mariner SQL server names: tsitinfdbsws008, tsitinfdbsws010; qaitinfdbsws028, qaitinfdbsws029; pritinfdbsws079
+```
+
+`tsitinfdb..` are test servers, `qaitinfdb..` are validation servers, and `pritinfdb` is the production server.
+
+### Tips on navigating MarinerDB (from Steven Liu)
+
+- Total of two Test, QA, and Prod servers. The current year database every year alternates between the two.
+- The data base `MARINERDB` is on each server corresponds to the current year. `MarinerDB_20xx` corresponds to previous year's.
+- Test/QA/Prod servers have the same database schema, just different values (validated vs. not).
+- Each database has cut off at July of every year.
+- Gordon's team is currently migrating previous databased `GASIMDBSQL..` to `tsitinfdb..`, `qaitinfdb..`, and `pritinfdb...`. Prd servers have not finished migration yet.
+- Gordon's team is looking to connect the databases to New Century tools. This year's goal is to run P-16 calculations (TP-4810P-16, thread-identification) scripts in New Century (which Foundry can alreayd do really).
+  - Why not Foundry? Because it doesn't handle spatial data well.
+- Tables `J8LP.BLANKS_LEAKMSTRRISKSCORE_STATIONMERGE_CENTERLINE20<XX>MATCH_EVENTS` are created by Jackson, ask him about it.
+- All tables for general "public" consumption are prefixed with `dbo.`.
+  - Variable mapping [spreadsheet](https://pge.sharepoint.com/:x:/r/sites/TIMPRisk/_layouts/15/doc2.aspx?sourcedoc=%7Bee520059-b61b-4c53-af05-eb4e1f389d19%7D&action=edit&activeCell=%27IndividualThreatDomains%27!D2&wdinitialsession=307f8813-bbcf-40b3-9b3e-37dab54c93b3&wdrldsc=4&wdrldc=1&wdrldr=AccessTokenExpiredWarning%2CRefreshingExpiredAccessT&cid=c56723dd-b1df-4b8a-b33d-d6e9a2d7cabf) tells which tables are for a lot of the input data.
+  - Risk result tables are suffixed with "risk-results".
+  - A lot of intermediate, backup, comparison, test, and triage tables.
+  - Final tables have no dates in the names.
+  - Intermediate tables harder to distinguish -- refer to the variable mapping doc.
+
+## ILI results...
+
+The ILI failure pressure numbers are in ILI results. Ideally I don't need to manually extract from the Vendor report..
+
+Steven mentions it's in Geomart, and doesn't recommend getting access to that database, and recommends accessing the `.gdb` export instead.
+
+For 2022 data, see export: `\\utility.pge.com\projects\sysintegrity-fs01\SysIntegrity\RiskMgmt\SI\S3LG\QRAD 2022\ILI\ILI_EXport.gdb`.
+
+Problems:
+
+- Should be able to see it in Window Explorer, can look at the files in ArcCatalog, and interact with the data in details in ArcGIS.
+- But I can go to the folder in ArcCatalog, but cannot see it in Windows Explorer..wtf?!
+
 
 
 
