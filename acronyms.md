@@ -27,4 +27,4 @@
 - ERW: Electric resisstance welded
 - EMAT: Electro-magnetic acoustic transducer (ILI method) -- gives SCC info
 - MFL: Circumferential magnetic flux leakage (ILI method)
-- WT: Weld type
+- WT: Wall thickness

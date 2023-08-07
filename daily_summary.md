@@ -987,7 +987,7 @@ Different methods to take into account of future crack growth -- if the model sa
 The data on the next assessment can be used to validate models!!
 
 
-# Week of 7/31/2023
+# 7/31/2023
 
 Switching to weekly updates because more implementation now..
 
@@ -1050,6 +1050,78 @@ Problems:
 
 - Should be able to see it in Window Explorer, can look at the files in ArcCatalog, and interact with the data in details in ArcGIS.
 - But I can go to the folder in ArcCatalog, but cannot see it in Windows Explorer..wtf?!
+
+# 8/1/2023
+
+Tally of access requests I'm waiting on:
+
+1. Foundry data sources: `data_scientist` group
+2. Get access to Geomart's ILI data export: `Per-prod-ecm` AD group
+3. Get access to MarinerDB's new servers: `Apr-A3266-Dev-TIMP`, `Apr-A3266-QA-TIMP`, `Apr-A3266-Prod-TIMP`, `L3-A3266-QA`, `L3-A3266-Dev`, `L3-A3266-Prod`
+
+Learning:
+
+1. Brush up on SQL server and queries
+2. [PowerBI dashboard](https://app.powerbi.com/groups/me/reports/a57d0aa1-9bc5-4ee4-b2ed-61f45885a60a/ReportSection?ctid=44ae661a-ece6-41aa-bc96-7c2c85a08941&experience=power-bi) -- Ian wants to clean up the "WOR Metrics", "CE Report Status" (Miguel owns the data), and "direct cause analysis" (Jeremy owns the data) pages.
+    - Ian to give specs later
+
+Meetings/tracking people down
+1. Jorgen Vos -> Doug Warner -> Dickson Menang: About restoring MarinerDB access on Foundry. But probably wait until I have the MarinerDB access group status granted to do.
+2. Alec McCullick: Ask them about their Foundry data integration work..
+
+TODO:
+- Read TD-4810P-18
+- Read TD-4810P-16
+
+
+# 8/7/2023
+
+## ILI Tally storage meeting
+
+Steven Hui is leaving, but has not finished ILI Tally yet, meeting was about how to handle the ILI data.
+
+__Current state__
+
+- ILI vendors deliver data and reports in various format (csv, sql, etc) to the ILI team.
+- ILI engineers go through the report, validate, and iterate with vendors until the reports become acceptable.
+- Vendor data is delivered to the ILI team.
+- ILI data is:
+  - Saved in TIMP library (`\\rcshare03-nas3\TIMP_Library`) -- mostly raw format, not immediately usable because the pipeline segments need to be converted into (longitude, latitude) or reference scheme first, for example.
+  - Saved in GeoMart
+- TIMP and other teams downstream use the data. Currently, the process is to get GeoMart export and go from there.
+
+__Problems__
+
+- Error sources can contain:
+  - Vendor -> ILI (engineering errors)
+  - ILI -> GeoMart (a lot of formatting problems)
+  - Want a longer-term solution that doesn't require so much manual validations.
+- Why GeoMart?
+  - ILI's incumbent solution, they have invested a lot of resources into GeoMart through the years (Steven Liu)
+  - GeoMart is "spatial-aware" -- makes it easy for the data inside to be overlaid onto GIS applications.
+  - When entering data, if data doesn't pass certain QC checks, will not allow data upload.
+- Why not GeoMart?
+  - ILI template changes and gas-viewer changes make it unable to work for newer ILI pipe tallies (after 2021).
+- Steven Hui, for example, does manual validation and integration into GeoMart (not sure what exaclty though...)
+
+__Solutions__
+
+- Current ILI-export from GeoMart is the validated version, but doesn't inlucde ALL the vendor-delivered data.
+  - Some columns can be missing from the older tallys.
+- Currently, Satvinder Sidhu has manually gone through the ILI tallys to manually compile all reports since 2001 to 2023, into a __single excel spreadhsheet__.
+  - "I also somewhat question the data in GeoMart because I have looked through some of the older Pipe Tallies and they were not converted correctly. The .csv file I produce will be cleaner and contain all files up to 07/2023" -- Satvinder
+  - The report that Steven was working on is for tallies between risk runs.
+
+__Problem Reamins__
+
+- Currently there isn't a good long-term solution, other than Satvinder's manual compilation, which is unscalable.
+- TIMP doesn't really trust the ILI data in GeoMart..still need to go through QC process, which should ideally be ILI's job.
+
+Need to find out:
+
+- Who does the ILI data integration into GeoMart? Thien-An says it's via PowerQuery...
+- Is ILI very entrenched about using GeoMart? Steven Liu says it's their system of record..but is it??
+- Alec's Foundry process -- possible to incorporate ILI data?
 
 
 
