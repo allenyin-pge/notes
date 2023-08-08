@@ -1063,7 +1063,7 @@ Learning:
 
 1. Brush up on SQL server and queries
 2. [PowerBI dashboard](https://app.powerbi.com/groups/me/reports/a57d0aa1-9bc5-4ee4-b2ed-61f45885a60a/ReportSection?ctid=44ae661a-ece6-41aa-bc96-7c2c85a08941&experience=power-bi) -- Ian wants to clean up the "WOR Metrics", "CE Report Status" (Miguel owns the data), and "direct cause analysis" (Jeremy owns the data) pages.
-    - Ian to give specs later
+    - Ian to give specs later -- Kiana can handle this
 
 Meetings/tracking people down
 1. Jorgen Vos -> Doug Warner -> Dickson Menang: About restoring MarinerDB access on Foundry. But probably wait until I have the MarinerDB access group status granted to do.
@@ -1117,11 +1117,18 @@ __Problem Reamins__
 - Currently there isn't a good long-term solution, other than Satvinder's manual compilation, which is unscalable.
 - TIMP doesn't really trust the ILI data in GeoMart..still need to go through QC process, which should ideally be ILI's job.
 
-Need to find out:
+Need to find out: #Actionables
 
 - Who does the ILI data integration into GeoMart? Thien-An says it's via PowerQuery...
 - Is ILI very entrenched about using GeoMart? Steven Liu says it's their system of record..but is it??
 - Alec's Foundry process -- possible to incorporate ILI data?
+
+## Foundry access granted -- try to link MarinerDB?
+
+# 8/8/2023
+
+Meeting with Alec about Foundry and incorporating gas data: [notes](https://pge.sharepoint.com/:w:/r/sites/TIMPRisk/Shared%20Documents/Data%20Improvement%20Project/Foundry/alec_foundry_meeting_notes_08082023.docx?d=we02c7b78b53c476c89fecd5200ae41c7&csf=1&web=1&e=D5Z2fX).
+
 
 
 
