@@ -1129,6 +1129,62 @@ Need to find out: #Actionables
 
 Meeting with Alec about Foundry and incorporating gas data: [notes](https://pge.sharepoint.com/:w:/r/sites/TIMPRisk/Shared%20Documents/Data%20Improvement%20Project/Foundry/alec_foundry_meeting_notes_08082023.docx?d=we02c7b78b53c476c89fecd5200ae41c7&csf=1&web=1&e=D5Z2fX).
 
+# 8/11/2023
+
+## More Foundry migration notes
+
+- Todd Arnett compiled data list by soliciting from different groups in TIMP.
+
+How will migrating to Foundry change our data integration process?
+
+- Format changes in ILI for example, would have to go through some kind of data change process: ILI team informs us data format changes and why -> we review/approve and prep for these changes
+- This process would have to be applied to all different datasets that feed into the risk model.
+- Are we the biggest consumer of these datasets? Need to work with different groups to establish this process.
+
+Concenrs with Foundry migration:
+- Start with some simpler dataset than ILI tally, e.g. Pipeline PFL?
+- Ian suggest "MetDB" -- Metallurgical database, compiled by Brian Patrick and Satvinder and we have strict control of this data base.
+- In order of complexity: MetDB -> PFL -> ILI tally.
+
+# 8/14/2023
+
+## Learning about Snapshot review from Thien-An
+
+__Context__:
+Every year, AKM team makes a snap shot of the data in GTGIS, specifically of PFL (pipeline feature list), and HCA/class of each pipeline segment. The PFL serves as the "center line data" for risk assessment. HCA/class data gets updated every year.
+
+__Review of snapshot data__:
+
+- The snap shot data comes in the form of a big excel sheet, with different columns and rows equal to the total number of actual pipeline segments.
+- This spreasheet needs to go through review to make sure the data in it makes sense.
+- Thien-An compiles a list of ~200 rules, which derive from historical comments from different risk engineers and various heuristics. Examples:
+  - "Coasting type X is not possible before year 1930 because it wasn't invented"
+  - "The pipe diameter size cannot be less than Y"
+- Thien-An then looks through all the columns of the Snapshot dataset, and checks whether they violate any of the 200 rules.
+- He then flags these violations to Gordon, who then reviews them, and those actually need fixing get fixed in GTGIS via the AKM (something knowledge management) team.
+
+Remarks:
+- There are recurring problems: problems that are identified and fixed in year 1, but then occur again in year 2. Don't know why they happen -- problematic!
+- These are essentially 200 QC rules that could be automated, such that the flagging doesn't have to be done manually. This will automate the snapshot validation process.
+  - How much time would this save? Thien-An estimates about an hour...so maybe not super high priority?
+
+Other problems:
+- PFL dataset can be out-of-date due to lagging in PFL updates to reflect pipeline projects. What's TIMP's involvement in the process?
+  - TIMP give inputs on pipeline threat identification, flagging pipes that may need work
+  - Sub-selection of the pipes are flagged to have work done by downstream teams
+  - Pipelines are fixed and/or replaced, and the PFL is updated accordingly.
+- However, these PFL updates are not necessarily showing up in GTGIS in time, and without knowing about specific projects, it's hard to identify these errors.
+  - **Remark**: Opportunity to integrate these project events into Foundry with the PFL dataset as "events"
+- Also in GTGIS, every pipe segment has a feature-number to map onto the original project drawing in GTGIS.
+
+__Data validation__: Example using leak data.
+- Various leak events are gatherd by Miguel, who makes surer they get mapped to the right pipeline segment.
+- Inidividual threats also collect the relevant leak events after confirmation by DCA and RCA.
+- Process:
+  - Leak event identified, Miguel records it in his dataset.
+  - If RCA/DCA confirms an event as SCC/SSCW/manufacturing defect, the specific risk's engineer put the event in their compilation, and Miguels takes it out of his.
+- The different leak datasets are disjoint.
+
 
 
 
