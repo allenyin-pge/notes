@@ -1185,6 +1185,33 @@ __Data validation__: Example using leak data.
   - If RCA/DCA confirms an event as SCC/SSCW/manufacturing defect, the specific risk's engineer put the event in their compilation, and Miguels takes it out of his.
 - The different leak datasets are disjoint.
 
+## Gordon's thoughts on Foundry data migration
+
+Gordon overall supports migration of data into Foundry, especially if it has the the ability to replace offline databases as well, rather than simply acting as a "view" of the underlying data.
+
+The major concerns here have been combating data format changes of a dataset:
+- Snapshot dependent dataset can be complicated. Ex is AKM/GTGIS data:
+  - The data changes too much, due to things like stationing change -- with better survey data, older/more inaccurate data is updated constantly, therefore requiring snapshot process.
+- Field-collected data (with lats, longs), "work-done" type of data, and cleaned datasets (leak data) are good candidates for Foundry migration/storage because they are more static.
+
+For GTGIS data, Gordon envisions quality checks to be done automatically, which enables quicker model iteration, but it would still require a snapshot process to track data lineage.
+
+__Schema changes__: Due to data collection or planning work that would assign different coding categorizations. Threat chairs would determine whether these changes warrant actual schema changes, or a simple remap of the previous year's scales.
+  - Concern with Foundry: What would the process for Schema changes be in this process?
+
+__Summary of what datasets are easier to migrate__:
+  - Planning datasets are prone to schema changes.
+  - Risk assessment datasets also prone to schema changes.
+  - Actual work performed, different records are usually static.
+  - DCA/RCA type of official datasets are also good for migration
+  - These datasets usually stored as spreadsheets -- might not be hard to convince others to enter data into "spreadsheet"-like tools instead of plain Excel.
+
+__Main Concerns with using Foundry__:
+  - Amount of support from the enterprise group.
+  - Do they understand our needs?
+  - Do we have to teach them a lot? e.g. Dynamic segmentation is something the IT people doesn't understand very much.
+    - **Remark**: Need to frame it using language the Foundry people understand, dynamic segmentation data would be a type of ontology probably.
+
 
 
 
