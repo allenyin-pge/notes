@@ -1213,6 +1213,28 @@ __Main Concerns with using Foundry__:
     - **Remark**: Need to frame it using language the Foundry people understand, dynamic segmentation data would be a type of ontology probably.
 
 
+# 8/21/2023
+
+## New MarinerDB prod server access:
+
+Requires getting MEA to `SDB-A3266-Prod-RO` and `SDB-A3266-Prod-RW`.
+
+## ILI data source and SME:
+
+Who to contact on the ILI team to understand the data and how/where to store?
+- Steven Lee (S7LF): new to the process, primary responsiblity is to convert the delivered pipe tallies into a standard format and upload them to the TIMP share drive.
+- Actual QC and conversion from TIMP ILI: __Laila Hassen__. Other process owner is __Christine Avery__.
+- ILI team has a network folder as staging for all finalized pipe tallies: `\\rcnas01-smb\timp-fs01\GeoMart` -- files sorted by year and type of ILI.
+
+## Foundry learnings:
+
+- [Ontology High Level Data Pipeline - Data & Analytics - PGE Wiki](https://wiki.comp.pge.com/display/ARAD/Ontology+High+Level+Data+Pipeline): Ontology objects can have different maturity level and designations (base, curated, augmented) based whether they are raw data source, and the amount of processing they've undergone.
+- [Object Maturity - Data & Analytics - PGE Wiki](https://wiki.comp.pge.com/display/ARAD/Object+Maturity): Different datasets/ontology objects have different maturity levels based on sets of minimum data requirements (i.e. verification and approval).
+- [New & Changed Object Workflows - Data & Analytics - PGE Wiki](https://wiki.comp.pge.com/pages/viewpage.action?pageId=160269236): Goes through the process of getting a new ontology object into Foundry
+- [Change Management - Data & Analytics - PGE Wiki](https://wiki.comp.pge.com/display/ARAD/Change+Management): Goes through the process needed to get changes to an existing Foundry ontology/dataset, which is handled through the OIT team for production objects.
+
+
+
 
 
 
