@@ -1233,6 +1233,57 @@ Who to contact on the ILI team to understand the data and how/where to store?
 - [New & Changed Object Workflows - Data & Analytics - PGE Wiki](https://wiki.comp.pge.com/pages/viewpage.action?pageId=160269236): Goes through the process of getting a new ontology object into Foundry
 - [Change Management - Data & Analytics - PGE Wiki](https://wiki.comp.pge.com/display/ARAD/Change+Management): Goes through the process needed to get changes to an existing Foundry ontology/dataset, which is handled through the OIT team for production objects.
 
+# 8/23/2023
+
+## Failure pressure meeting
+
+__B31G__
+
+Computes failure pressure in Attachment3. B31G is a convervative version of RSTRENG. This is different from ILI failure pressure..how?
+- We want to know if a pipe is likely to fail as a leak or rupture, and we assume the flaw to be growing. ILI failure pressure assumes the flaw size as is.
+- The POE-LOF calculation also assumes flaw to be growing.
+
+__Segment vs. Defects/flaws__
+
+ILI tally lists indidivudal defects and flaws detected. A pipe segment can have multiple defects. Consequently, the failure pressure from ILI is PER DEFECT, while the failure pressure calculated as part of the POE-LOF process is PER SEGMENT.
+- How to get PER SEGMENT failure pressure from the PER DEFECT failure pressure? (Minimum maybe?)
+
+__Which failure pressure is more reliable?__
+
+Both Jackson and Brian suggest using the ILI tally failure pressure. With caveats:
+- Older pipe tallies (i.e. more than 7 years ago) results are less reliable.
+- Flaws can grow/shrink, disappear/appear since multiple ILI runs on the segment can yield different results.
+- Inadvisable to match flaw-level results.
+
+__Other gotchas__
+- Check the install date of the pipe that I'm comparing against to be before the ILI data.
+- In the LOF-Alg calculation (non-POE), a mitigation factor is applied. Could be useful to run calculation with/without it.
+
+Terminology
+- CVN: Charpy-venotch toughness ratio
+
+## Investigating different ILI data sets
+
+Satvinder's illustration of the pipe tally delivery process:
+
+![pipe tally delivery process](./assets/ILI_Pipe_tally_delivery_process.png)
+
+ILI stores their final Pipe Tallies and Vendor reports here: `\\RcShare03-NAS3\TIMP_Library\ILI`
+
+Ideally the process will work like this:
+
+1. Vendor delivers Final Pipe Tally
+2. Steven Lee from ILI uploads Final Pipe Tally to `\\RcShare03-NAS3\TIMP_Library\ILI`
+3. Steven Lee converts Final Pipe Tally to standard format
+4. Steven Lee uploads converted Pipe Tally to `\\RCNAS01-smb\Timp-fs01` (this location can change)
+
+**Remark**: Foundry should then be able to make connection to the `\\RCNAS01-smb\Timp-fs01` location.
+
+__What is the standard format?__
+
+The "standard format" is based on how the data was historically structured in GeoMart. What Satvinder currently doing is ensuring all pipe tallies delivered prior to 08/01 are in that format so he can aggregate the data through Power Query. Steven will help ensure all Pipe Tallies delivered after 08/01 are also in this "standard format". Here is an [example](https://pge-my.sharepoint.com/:x:/g/personal/sfsy_pge_com1/Eaw9ESXjoYRNpuJO0lB-DVEBKz674ARHYooeL4f515cqbQ?e=bd7QdL):
+
+The first tab is how the Tally is delivered from the vendor and the second tab is the standard/converted format
 
 
 
