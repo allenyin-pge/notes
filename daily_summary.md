@@ -1285,6 +1285,37 @@ The "standard format" is based on how the data was historically structured in Ge
 
 The first tab is how the Tally is delivered from the vendor and the second tab is the standard/converted format
 
+## ILI failure pressure data from MarinerDB
+
+Copying from chat with Jackson for easy reference:
+
+So regarding the actual data (suppose I'm looking into tstitinfdbsws010 or tstitinfdbsws009, MarinerDB_2022), how do I get:
+
+- ILI failure pressure -- which table do you recommend I use? `POE_TRADILI_MATCHED_2022` or some other table? If the former, I'd have to map the flaw location to the pipeline segments that the LOF alg operates on.
+  - Answer: Yes use `POE_TRADILI_MATCHED_22`
+- Model results calculated using the LOF-Algorithm (not POE) for the pipe segments with available ILI data -- do I get them from failure_pressure table or something else?
+  - Answer: Use `EC_RISK_LOF` table to get the non-POE EC risk lofs. "Turns out I don't have the non-POE EC LOFs in the `RiskResults_int2022` table after all" (Jackson)
+- How do I map the rows in `POE_TRADILI_MATCHED_2022` table to the different dynamic pipeline segments? The failure pressure table has columns like `route`, `beginstationnum`, `endstationnum`, `beginstationseriesid` for presumably the different dynamic pipeline segments.
+  - Answer: "you want to check if `SeriesID` = `beginstationseriesid` and `stationing` between `beginstationnum` and `endstationnum`. I typically do a `>=` for begin and strict `<` for end, that way you don't get any defects mapped onto two segments".
+- How does the ILI data already know the dynamic segments?
+  - Answer: "I have a GIS script that stations them based on latitude and longitude. It's not always exact though. The tallies have route name though, so I match on that and distance to pipe [...] it's called 'stationing' pipes, though Uriel Garcia is probably better at it then I am" (Jackson)
+
+# 8/29/2023
+
+## Meeting with Kiana
+
+__PowerBI__
+- Kiana keeps track of all the different data sources, columns, and calculations that go into each metric.
+- Kiana to share sharepoint doc with me.
+- Next week: Kiana give estimate of PowerBI deadline.
+
+# 8/30/2023
+
+## Trying to finalize details of ILI data-set details
+
+Satvinder uploaded all the clean ILI tally dataset onto `file://rcnas01-smb/Timp-fs01/2023%20ILI%20Pipe%20Tally%20Consolidation/`. But I can't access it, again!
+
+Jackson mentioned to use the [TSC chat](https://iis10t2prd.cloud.pge.com/MyITServices/tsc/chat) to find out the right AD group to request access.
 
 
 
