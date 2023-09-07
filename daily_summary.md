@@ -757,12 +757,12 @@ Anaconda installation:
 - Configure anaconda package installation, following PGE [wiki link](https://wiki.comp.pge.com/display/DAF/Install+New+Python+Packages)
   - Note that on `conda update anaconda`, may run into problem where `_ctypes: dll cannot be found` error. In that case go to the Anaconda installation folder, then go to `Library/bin` , then do `mv .\ffi.dll.c~.conda_trash ffi.dll` to change the file name.
   - Also see more about the error [here](https://github.com/conda/conda/issues/12531)
-- Now we can indstall packages. I use pytorch, so `conda install -c conda-forge pytorch` should work.
 - Update powershell and vscode to have conda enabled, following [this](https://www.scivision.dev/conda-powershell-python/). In conda prompt, do:
   - `conda update conda`
   - `conda init`
 - Now all the powershells will have it enabled, and you won't have to mess with stupid settings in vscode, for example.
-
+- Follow this [link](https://wiki.comp.pge.com/display/DAF/Install+New+Python+Packages) to configure SSL settings so conda packages can be installed!
+- Now we can indstall packages. I use pytorch, so `conda install -c conda-forge pytorch` should work.
 
 # 7/24/2023
 
@@ -1318,7 +1318,130 @@ Satvinder uploaded all the clean ILI tally dataset onto `file://rcnas01-smb/Timp
 Jackson mentioned to use the [TSC chat](https://iis10t2prd.cloud.pge.com/MyITServices/tsc/chat) to find out the right AD group to request access.
 
 
+# 9/5/2023
 
+## Meeting with Ian
+
+Brought up additional data need for Corrosion Engineering Team (driven by Enterprise risk). Essentially, Corrosion Engineering team wants an additional post-ILI procedure to flag pipelines for prevention and mitigatio measures according to additional critieria:
+- Any time corrosion deeper than 50% of wall thickness is found on ILI run
+- Whenever majority of corrosion occurs on one section of pipe. This has been defined as volumetric wall loss 2 standard deviations above the mean.
+- When either of the above conditions are true, the CE team will gather the relevant cathodic protection data and set a meeting with Corrosion Engineering Superivsor and Corrosion Field Services Supervisor or their representatives.
+
+The challenge lies in how to define "section of pipe" and subsequently the sample population.
+- Will have to look at the results for different definitions of "section of pipe" and how that changes things.
+
+# 9/6/2023
+
+## ILI problem
+
+Doing performance measurement using ILI failure pressure data against EC LOF model outputs. For ILI failure pressure, I was looking at the `POE_TRADILI_MATCHED_2022`​ table in the `MarinerDB_2022` database, which was compiled from the historical ILI data sets in Geomart (past ILI tally were inserted into Geomart, then an extract pulled from there). Turns out there are ~234 cases where the failure pressure is less than 5 psi, 204 of which are negative.
+
+We can't have negative failure pressures. The table in MarinerDB is obtained through the process:
+
+```
+ILI_tally -> Geomart -> OracleDB -> MarinerDB
+```
+
+Satvinder has confirmed during his consolidation process that errors exist in Geomart AND the original tally files, which look like have propagated to the marinerDB. Luckily the failure pressure data in that marinerDB table doesn't actually enter the risk model calculations.
+
+I'm going to get help from Jackson and Gordon to apply the GIS stationing process to Satvinder's consolidated ILI data set to proceed with model evaluation work.
+
+## Satvinder giving examples about the anomalies
+
+> The <5 PSI is likely due to Failure Pressure being in Pf/MAOP ratio column and vice versa. The data was imported into GeoMart as-is, which caused the MarinerDB to be incorrect.
+
+> I found multiple Pipe Tallies (usually 2017 or older) with similar and other discrepancies. I’ve categorized my findings below: 
+
+| Data Discrepancies | Occurrence |
+| ---------- | ------ |
+|Failure Pressure (Pf) and Pf/MAOP data are switched | Low |
+|D/S Reference & Dist. To D/S Ref [ft] data switched | Medium |
+|Some files have both Tool Speed (mph) MFL-A and Tool Speed (mph) MFL-C, others only have Tool Speed (mph) MFL-A | Low |
+|Some files have both Tool Speed (mph) MFL-A and Tool Speed (mph) XT, others only have Tool Speed (mph) MFL-A | Low |
+| Some files have both Tool Speed (mph) MFL-A and Tool Speed (mph) MFL-C and Tool Speed (mph) XT, others only have Tool Speed (mph) MFL-A | Low |
+| “UNKN” and “SMLS” values in Seam Pos. column — should only be orientation | High |
+| “UNKN” and “SMLS” values in O’Clock column — should only be orientation | High |
+| “NA” in O’Clock column — should be blank | High |
+| Latitude/Longitude contain degrees symbol after value | Low |
+| “—" in Dist. To U/S Ref [ft] and Dist. To D/S Ref [ft] | Medium |
+| “.” after Station Number value | Medium |
+| “TBD” in WT(in) column | Low |
+| Rosen Pipe Tally format inconsistent with Pipetel/Intero V4 format | High | 
+
+Many of these discrepancies exist only in legacy Tallies, and I know over the years, the ILI Team has standardized the Pipe Tally template and implemented a QC process.
+
+# 9/7/2023
+
+## EC LOF learnings
+
+Connecting to the MarinerDB's table `EC_Risk_LOF`, I can now see the different EC risk model outputs. Some useful things to note:
+
+- `EC_LOF_Leak_EX`: Value for if pipe is exposed above ground (calculated according to attachment 3, taking into account atmospheric corrosion)
+- `EC_LOF_Leak_No_EX`: Value for if pipe is not exposed
+- `EC_LOF_Leak`: Final value, taking the appropriate one according to if pipe is actually exposed.
+
+As attachment 3 describes, for EC, there are both rupture and leak LOF associated with it. When plotting them out, we see the following distributions:
+
+![EC_histogram](./assets/EC_LOF_dist_rupture_vs_leak.png)
+![EC_correlation](./assets/EC_LOF_rupture_vs_leak.png)
+
+It's clear that the rupture LOF is much higher than that of the leak LOF. This is because they use different units!
+
+- Leak LOF has units of severe events per mile-year
+  - Number of leaks that involve a SIF on the transmission side is super low, so we end up multiplyin the adjustment factor by something about 2 orders of mag lower (see attachment 3, Table 2 baseline level)
+- Rupture LOF has units of ruptures per mile-year
+
+But why the leak and rupture LOF curve shows essentially two vertical lines? I initially expected that a pipe in bad shape would have both higher chance of leak AND rupture...Brian Patrick explains:
+
+> Each `S` score for a threat turns into adjustment factor, then gets multiplied by the baseline rate to get to an LOF, and each segment will EITHER be leak or rupture, for a particular threat.
+
+> We do not have any logic for mixed failure modes as of yet..prob should be a probability distribution.
+
+So essentially, the model assumes failure either by rupture or leak, hence the weird looking graph. Is it reasonable? maybe..
+
+> In general when we roll up the results, all of the leak segments drop off, since they more or less round to zero.
+
+Does this mean leaks will always stay there, until data show the rupture LOF for that segment becomes high?
+
+> The model right now [...prioritizes on] whether it's possible for the pipe to blow up, based on the biggest defect we have removed, with some more conservatism built on top. We essentially assume the pipe is 70% weaker than normal, then determine whether that would rupture.
+
+So sounds like rupture LOF would always get bigger faster than leak LOF...is there any value for calculating leak LOF then?
+
+> We have to do it per code.
+
+> In terms of asset health, AF would be more of an indicator...Pf/MAOP is how close it is to failing, and does not take the failure mode into account.
+
+__Important__: Benchmark model outputs and ILI failure pressure against Pf/MAOP and AF!!!
+
+> Getting Pf/MAOP value <1.0 is not super uncommon, happens a few times a year..most of the times it is due to over-conservative assumptions.
+
+And this was found out after the pipe was dug-up and inspected.
+
+## ArcGIS stationing and spatial join
+
+How to convert ILI tally excel sheet so the info is compatible with the dynamic pipe segments in MarinerDB? Two methods: "stationing" or "spatial join".
+
+- Stationing: Given ILI coordinates, query the pipeline data (from GTGIS) and match pipe centerline, then get stationing number. Then match these info agains the MarinerDB pipe segments.
+- SpatialJoin: Given ILI coordinates and specific pipe segments (import both into ArcGIS), and the pipeline data (from GTGIS), do "spatial join" operation to output the results.
+
+GTGIS pipeline spatial information has snapshots every year -- use correct year's snapshot! Stationing process is supposedly more precise than spatial-join (assuming coordinates are correct).
+
+During ArcMap/ArcGISPro operation, use `WGIS84` format for coordinates.
+
+## TIMP has remote desktops!
+
+For use as devservers:
+
+```
+WSSR489887.utility.pge.com                   
+WSSR507841.utility.pge.com                  
+WSSR647920.utility.pge.com
+WSSR647918.utility.pge.com
+WSSR640770.utility.pge.com
+WSSR640771.utility.pge.com
+WSSR551388.utility.pge.com
+WSSR529284.utility.pge.com
+```
 
 
 
