@@ -1421,7 +1421,7 @@ And this was found out after the pipe was dug-up and inspected.
 
 How to convert ILI tally excel sheet so the info is compatible with the dynamic pipe segments in MarinerDB? Two methods: "stationing" or "spatial join".
 
-- Stationing: Given ILI coordinates, query the pipeline data (from GTGIS) and match pipe centerline, then get stationing number. Then match these info agains the MarinerDB pipe segments.
+- Stationing: Given ILI coordinates, query the pipeline data (from GTGIS) and match pipe centerline, then get stationing number. Then match these info against the MarinerDB pipe segments.
 - SpatialJoin: Given ILI coordinates and specific pipe segments (import both into ArcGIS), and the pipeline data (from GTGIS), do "spatial join" operation to output the results.
 
 GTGIS pipeline spatial information has snapshots every year -- use correct year's snapshot! Stationing process is supposedly more precise than spatial-join (assuming coordinates are correct).
@@ -1443,6 +1443,56 @@ WSSR551388.utility.pge.com
 WSSR529284.utility.pge.com
 ```
 
+# 9/22/2023
+
+I know how to do spatial-join now, now I need to get the data to conduct this.
+
+Data sources:
+- Pipeline data: From GTGIS...where to get these?
+- ILI Coordinates: This is from Satvinder's big excel sheet.
+
+Question I need to figure out:
+1. How to create a "geo-database" -- do I import from the GTGIS file? From Gordon:
+  - Current year's pipeline data (GTGIS snapshot) is in `V_PFL_ALL layer`, in the ArcGIS [database]( \\rcnas01-smb\sysintegrity-fs01\SysIntegrity\RiskMgmt\SI\SME_Tables_RiskAnalysis\QRAD_2023\DataQuality\V_PFL_ALL.gdb\V_PFL_ALL_spatialonly081023).
+  - For previous years, they are in the `Pipesegment` spatial layers in each year's `validationdata.gdb` -- can ask for historical archives from the GTGIS team.
+  - GTGIS has the current data in 2 layers in Oracle SDE (ESRI spatial database engine): "Linear_Features" and "Point_Features", will need permission to access the oracle data.
+  - For 2022, for example, all the pipe segments data exported from GTGIS can be found in [this database](\\rcnas01-smb\sysintegrity-fs01\SysIntegrity\RiskMgmt\SI\SME_Tables_RiskAnalysis\QRAD_2022\Validation\ValidationData.gdb\Pipesegment_linear)
+2. For ILI Coordinates...I start with 2022's inspected segments?
+
+Specifics of doing spatial join:
+1. Inspect data -- look at ArcMap's map display -- laod both ILI points and pipesegment layer.
+  - To turn ILI x/y data into points, you'll specify lat/long coordinates and use "Georgraphic coordinate system -> World -> WGS84".
+  - When running spatial join any coordinate conversions are handled automatically by the spatial join tool, need to turn the ILI data into points first.
+2. ArcMap has a data scaling problem, Gordon suggests:
+  - Use thte ArcGIS Model builder "iterate" tool to build a loop (or use Python), then subdivide the ILI data into probably 10-50k record chunks for processing, then merge the results together.
+  - Use Arcpy to run spatial join in the python script.
+
+# 9/26/2023
+
+ILI data problems...loading in ILI data in Python (which actually works, and excel freezes).
+
+For 2022's data:
+1) some data rows do not have Longitude/Latitude data.
+2) some data rows do not have "U/S Reference", "Dist to US Ref", combinations,
+3) Not all data rows contains a "PG&E Station Number"
+
+Satvinder indicates this is done to vendor error...but why these data don't have coordinates?
+
+This makes matching it to GTGIS Pipeline data difficult...why? From Gordon:
+
+> If there is stationing populated already for the anomaly we may be able to reference that year's centerline to get it spatialized. Without stationing or coordinates, the ILI run data will need to be aligned with centerline - this is usually a significant project for a GIS specialist to do and requires ground survey data that came with the ILI project. This work has not been done by us for several years because of software tool problems and lack of bandwidth, and also because ILI vendors do this work these days and give us coordinates.
+
+So what can we do? Ignore the anomalies without the coordinates...which is possible since it consists of only 0.26% of the available ILI data that year.
+
+Gordon also note the data seems to belong to NT runs (ILI runs with tethered tools that are not pushed by gas pressure, usually work in short pipe sections for difficult to reach areas) by looking at the "ILI Project name description".
+
+> My understanding is that for NT ILI runs the vendors do not do the spatial alignment work so we haven't been able to use their data at all for the risk run. NT projects are usually short but still we need a process to match the anomalies to location. The second screenshot has a few stationing values populated which is usable if we find that year's centerline (the year when they started the project). The US/DS distance are basically odometer readings I believe; this is used in the ILI spatial alignment process to pinpoint the anomaly, but cannot be used otherwise.
+
+And indeed, all the anomalies without coordinates belong to short NT runs! For 2022, these runs are 0.28 and 0.1 miles long. So we can ignore them for now.
+
+Additionally, Gordon mentions ILI datasets with significant missing lat/long are excluded from risk runs.
+
+__But this also begs the question -- what's the point of doing NT runs if we are not using the data? Do they lead to direct examination?__
 
 
 
