@@ -65,3 +65,24 @@ Digging up the pipes is very expensive
 
 
 PHMSA: Gas regulator, "mandated" the use of quantitative model
+
+
+
+# TODO Backlog
+
+## 7/18/2023: Sensitivity analysis:
+
+Sensitivity analysis on what variables/data sources affect the model output?
+
+Goal -- to inform future data collection project decisions.
+
+
+## 9/5/2023: Corrosion engineering team:
+
+Ian Brought up additional data need for Corrosion Engineering Team (driven by Enterprise risk). Essentially, Corrosion Engineering team wants an additional post-ILI procedure to flag pipelines for prevention and mitigatio measures according to additional critieria:
+- Any time corrosion deeper than 50% of wall thickness is found on ILI run
+- Whenever majority of corrosion occurs on one section of pipe. This has been defined as volumetric wall loss 2 standard deviations above the mean.
+- When either of the above conditions are true, the CE team will gather the relevant cathodic protection data and set a meeting with Corrosion Engineering Superivsor and Corrosion Field Services Supervisor or their representatives.
+
+The challenge lies in how to define "section of pipe" and subsequently the sample population.
+- Will have to look at the results for different definitions of "section of pipe" and how that changes things.

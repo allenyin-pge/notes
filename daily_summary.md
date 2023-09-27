@@ -1494,8 +1494,62 @@ Additionally, Gordon mentions ILI datasets with significant missing lat/long are
 
 __But this also begs the question -- what's the point of doing NT runs if we are not using the data? Do they lead to direct examination?__
 
+# 9/27/2023
 
+More problems with the data sets.
 
+See [notebook](https://github.com/allenyin-pge/ModelPerformance/blob/master/EC_LOF_and_cleaned_ILI.ipynb) for examination results. Current procedures used to get ILI anomalies matched with MarinerDB EC_LOF table results:
 
+1. Take Satvinder's All_ILIData.csv, extract the rows for ILI that was completed in 2022 --> call this `clean_ILI_2022.csv`
+2. In ArcMap, opened the `Pipesegment_linear` layer from the [`ValidationData.gdb`](\\rcnas01-smb\sysintegrity-fs01\SysIntegrity\RiskMgmt\SI\SME_Tables_RiskAnalysis\QRAD_2022\Validation\)
+3. Imported `clean_ILI_2022.csv` into ArcMap. To "Display as X/Y Data", convert lat/long to "Geographic coordinate system -> World -> WGS84". The layer overlay looks to be ok 
+4. Spatial joined `Pipesegment_linear` layer to `clean_ILI_2022` layer, with "each point be given all attributes of the line closest to it"
+5. The joined layer is exported as `cleaned_ILI_2022_joins_Pipesegment_linear.csv` It now has attributes "route", "beginstationseriesid", "endstationseriesid", "beginstationum", "endstationnum".
+
+The spatially joined outputs look ok.
+
+![ILI_joins](./assets/ILI2022_joins_pipeSegments.png).
+
+Now I try to match the data in `cleaned_ILI_2022_joins_Pipesegment_linear.csv` with the pipelines present in MarinerDB 2022's `EC_Risk_LOF` table.
+- The server I connected to is "tsitinfdbsws010", db name="MarinerDB_2022"
+- I selected only the rows in the EC_Risk_LOF table, where ILI_Completion_Date is in 2022.
+
+## Issue 1: ILI route mismatch
+
+The set of "route" values in `EC_Risk_LOF` table are not the same as those derived from the ILI+Pipeline spatial join.
+
+Screenshot below is when I try to match the routes present in the EC_LOF table with the routes from the ILI tally:
+
+![routes_dict](./assets/risk_route_to_ILI2022_route.png)
+
+The next one shows the unique route numbers present in each data set:
+
+![route_set](./assets/risk_vs_ILI_route_names.png)
+
+Gordon mentions all the routes of the format "STUB*", "B**", "DF*", and "X*" can be ignored. But this still leaves routes like "400", "1202*", "118A", "132", etc with no matches.
+
+- We have determined that the `ILI_Completion_Date` field in the `EC_Risk_LOF` table comes from the `Assessment_history` table, which comes from Bill Boynton's assessment history reports.
+- These dates supposedly represent the dates when an ILI route project is COMPLETED.
+- Therefore, it should match that of the "survey date" field in the ILI tally sheet, as compiled by ILI team and Satvinder.
+- But the set of unique routes present in the `EC_Risk_LOF` table and the ILI tally, for the SAME year don't match, this would mean problems in:
+  - Data entry from assessment history into the MarinerDB and/or processing within, or
+  - Mismatch between the reporting in assessment history vs. ILI tally collection
+- Gordon confirms that the Bill Boynton's team operates independently from ILI tally, so will need to check the actual assessment reports for possibility of Option (2).
+
+But this issue may be side-stepped, if I only look at the sub-set of routes that match.
+
+## Issue 2: Pipeline segmentation mismatch
+
+I tried to match the ILI anomalies to the correct pipeline segment by matching the following between the `EC_Risk_LOF` table and the imported joined ILI tally data:
+
+1. Same `route`
+2. Same `beginstationserisid`
+3. `beginstationnum` and `endstationnum` range matching
+
+And then for the entire datasets, I get only 18 pipeline segments that have any anomaly entries mapped to it..
+
+Gordon mentions it's because the `EC_Risk_LOF` segments are more finely grained than the GTGIS pipeline segments, hence the mismatch. He suggests I import the `EC_Risk_LOF` data into ArcMap, spatialize it by "right click on table" -> "display route events", then finally export the spatialized data layer into a feature class.
+
+I can do this because `EC_Risk_LOF` segments are sub-segments of the pipeline segments...
 
   
