@@ -1552,4 +1552,39 @@ Gordon mentions it's because the `EC_Risk_LOF` segments are more finely grained 
 
 I can do this because `EC_Risk_LOF` segments are sub-segments of the pipeline segments...
 
-  
+
+## Next week todos...
+
+1. Check the results from spatializing EC_Risk_LOF as route events, and spatial joined to the ILI layer from before.
+2. Check assessment history and ILI tally in terms of routes, and ILI completion date.
+
+
+# 10/2/2023
+
+The spatial join crashed...have to redo it again. But just as a reminder of the procedures taken to join `EC_Risk_LOF` segments with the pipeline segments.
+
+1. Connect to marinerDB within ArcMap.
+
+![mariner_arcmap](assets/mariner_arcmap_connection.png)
+
+2. Copy the `EC_Risk_LOF` table over into my local copy of `Validation.gdb`, this can take a while.
+
+![table_to_gdb](assets/table_to_gdb.png)
+
+3. Load the table into ArcMap by dragging it to "Table of Contents"
+
+4. Load the previously spatial-joined `cleaned_ILI_joins_pipelineSegments` shape file into "Table of Contents" as well.
+
+5. Spatialize `EC_Risk_LOF` by "right click on table" -> "display route events", following config similar to below (change the table name). 
+
+![display_route_events](assets/display_events_settings.png)
+
+The end result shoud look something like this:
+
+![spatialized_route_events](assets/spatialized_route_events.png)
+
+The teal lines are the spatialized `EC_Risk_LOF` as route events, and the points are `cleaned_ILI_joins_pipelineSegments` layer.
+
+6. Then we can export the spatialized data layer (the lines) into a feature class.
+
+7. Then do spatial join between the two layers to get a table! Gordon mentioned to not display the existing layer to save rendering time.
