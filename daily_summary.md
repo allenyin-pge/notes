@@ -1559,7 +1559,9 @@ I can do this because `EC_Risk_LOF` segments are sub-segments of the pipeline se
 2. Check assessment history and ILI tally in terms of routes, and ILI completion date.
 
 
-# 10/2/2023
+# 10/4/2023
+
+## Spatial join goodness
 
 The spatial join crashed...have to redo it again. But just as a reminder of the procedures taken to join `EC_Risk_LOF` segments with the pipeline segments.
 
@@ -1588,3 +1590,36 @@ The teal lines are the spatialized `EC_Risk_LOF` as route events, and the points
 6. Then we can export the spatialized data layer (the lines) into a feature class.
 
 7. Then do spatial join between the two layers to get a table! Gordon mentioned to not display the existing layer to save rendering time.
+
+## Dataset migration and documentation
+
+There's a need to document how the different data sets that feed into the Risk Model get ingested, cleaned and handled. Right now this is localized to Steven Liu and Gordon Ye. Would be great to document these processes and edge cases, etc, like how Satvinder did with the ILI data set, so as to make Foundry migration easy and scalable, democratize the knowledge.
+
+## Corrosion wall loss statistics
+
+Ian wants to get started on the corrosion-engineering team's ask from 9/5.
+
+I'll do some prelim analysis on anomaly-level wall-loss from historical ILI data sets.
+
+# 10/5/2023
+
+Finally got some...not shitty data and results, with the ILI-data-spatial-joins-pipe-segments-joined-EC-LOF-table! For conciseness, I'm going to denote spatial join as `SJ()`. So the data table I'm using will be:
+
+`SJ(SJ(ILI, pipe_segments), EC_Risk_LOF)`
+
+Note that the order of operands in `SJ(.)` matters, they are not commutative, and this specific order of operation actually completes without crashing the laptop.
+
+The notebook is [here](https://github.com/allenyin-pge/ModelPerformance/blob/master/EC_LOF_and_cleaned_ILI_spatial_join.ipynb).
+
+I haven't yet figured out how to map multiple anomalies into a single pipeline segment, so right now the plot is values associated with an anomaly vs. the risk calculated for the dynamic pipe segment CLOSEST to it. When I work this step out, we likely the points will decrease.
+
+First ok-looking plots!
+
+![Pf_vs_Leak](assets/first_PF_vs_Leak.png)
+
+![Pf_vs_Rupture](assets/first_PF_vs_Rupture.png)
+
+Overall, it doesn't seem very informative...the general trend is that when Pf is low, Risk is high (both Rupture and Leak). When Pf is high, Risk is low. In between, it's all over the place, which indicates a lot of uncertainty in the model calculations..
+
+
+
