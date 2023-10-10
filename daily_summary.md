@@ -1621,5 +1621,27 @@ First ok-looking plots!
 
 Overall, it doesn't seem very informative...the general trend is that when Pf is low, Risk is high (both Rupture and Leak). When Pf is high, Risk is low. In between, it's all over the place, which indicates a lot of uncertainty in the model calculations..
 
+# 10/10/2023
 
+Worked on Ian's task of looking at wall-loss statistics from the ILI data. The notebook is [here](https://github.com/allenyin-pge/ModelPerformance/blob/master/cleaned_ILI_data_examination.ipynb).
+
+Some notes on cleaning the data:
+
+1. For external corrosion, we want the wall loss, this is recorded as the `Depth (%)` field in the ILI tally.
+2. We want to excluse all manufacturing-related wall loss. This can be done by filtering the `Identification` field of the ILI tally.
+3. There are many one-off `Identification` field values, such as `ext box xxxx-xxx`.
+4. Brian suggests use all rows whose `Identification`'s is not manufacturing related.
+
+Some statistics:
+1. After removing all rows whose `Identification` values are null or empty, there is a total of 1702946 rows from the compiled ILI data from 2000-2023.
+2. 94.8% of these rows have `Identification` values that occured only once (e.g. `ext box xxxx-xxx`).
+3. Approximately 8.188% of these rows are manufacturing related (139436/1702946).
+4. Out of the remaining 1563510 non-manufacturing anomalies, 647945 anomalies (41.4%) have `Depth (%)` field, i.e. wall loss measurement available.
+
+Wall-loss statistics:
+- Out of all years' available data pooled, the mean anomaly wall loss is 15.638%, 2D=32.846%.
+- Over the different years available,
+  - Mean wall loss for different years range from 1.77% to 28.75%.
+  - 2D wall loss for different years range from 13.03% to 54.0% (mean 2SD=35.37%).
+- The overall and yearly 2SD numbers are pretty close, being conservative, we would make __32%__.
 
