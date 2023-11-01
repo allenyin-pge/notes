@@ -1645,3 +1645,86 @@ Wall-loss statistics:
   - 2D wall loss for different years range from 13.03% to 54.0% (mean 2SD=35.37%).
 - The overall and yearly 2SD numbers are pretty close, being conservative, we would make __32%__.
 
+# 10/12/2023
+
+Foundry team says maybe some of the datasets we need are already in Foundry -- compile all the datasets we need to for risk modeling and let them check.
+
+Foundry tutorials that the users of the dataset should do: [link](https://damask.palantirfoundry.com/workspace/compass/view/ri.compass.main.folder.6216e7b1-1dfc-4a44-a312-0d78502e1dd7)
+
+
+# 10/17/2023
+
+## Talking about performance measurements with Ian:
+
+- Does Pf/MAOP or  Pf matter more?
+  - Ask Brian about leak-rupture boundary.
+- Talk to Gordon about automating all of the spatial join process.
+  - But how many years of MarinerDBs do we have still?
+
+## About Corrosion percentage
+
+- What do we want from this analysis?
+  - Know what's a good criterion to dig up pipes and look for issues.
+  - Want to know areas with a lot of corrosions.
+- Try "volumetric" loss over one joint of pipe
+  - For anomaly with width/length, calculate volume...
+  - How to identify shallow but widespread, vs. deep but localized areas?
+
+## Foundry training
+
+PG&E internal resource for [Foundry training](https://pge-my.sharepoint.com/:b:/g/personal/sfsy_pge_com1/EauD9uyLgrNKjKlXWgXL-q8BUlCmHGRP-tXUiGLO37sVlg?e=bP9MJL)
+
+
+# 10/24/2023
+
+Compiling all the Foundary Ontology meeting notes, mostly from Jayna (lead on the dataset ingestion):
+
+- For ILI data, see [here](./FoundryOntologyNotes/ILI.docx)
+- For Leakmaster dataset, see [here](./FoundryOntologyNotes/Leakmaster.docx)
+- For CISRead dataset, see [here](./FoundryOntologyNotes/CISRead.docx)
+
+# 10/31/2023
+
+## Discussion with Ian about volumetric loss for corrosion.
+
+Updated notebook is still [here](https://github.com/allenyin-pge/ModelPerformance/blob/master/cleaned_ILI_data_examination.ipynb).
+
+Observations:
+- Not all anomalies with "depth (%)" field available have also width and length.
+  - Satvinder later informed me that not all of these rows are EC -- if the location is "internal", then it's an IC anomaly! So need to change that.
+- There are anomalies whose width is pretty much the entire circumference of the pipe. Laila from ILI confirms that this is possible. But this is this a very small percentage -- 99% of all anomalies have width less than 1% of the pipe circumference.
+- Need to redo the calculations to convert "depth (%)" to inches via the "WT (in)" field to get volumetric loss.
+- Plots show that the volumetric loss is heavily skewed to the right (need to take the log of the values to create distribution plot that looks more Gaussian/normal)
+  - Note that the x-axis unit is in `in^2 * (% wall loss)`, will have to correct this to `in^3`.
+
+![volumetric_loss](./assets/All_years_volumetric_loss.png)
+
+## Aggregating ILI data vs. Risk model outputs
+
+The notebook is still [here](https://github.com/allenyin-pge/ModelPerformance/blob/master/EC_LOF_and_cleaned_ILI_spatial_join.ipynb).
+
+Problem encountered:
+
+1. Look at unique combinations of `(beginstationseriesid, beginstationnum, endstationnum)`, since each pipe segment in the risk table is defined by this triplet.
+2. Doing some sanity check -- I assume that the `EC_LOF_Leak` and `EC_LOF_Rupture` values should be constant for all rows with the same combination of those values, if the spatial joins of the EC table and the other data are done correctly.
+3. What I saw is that about 21.6% of all such segments available have more than 1 EC_LOF_Leak values available
+
+The procedures I used to get the final {pipeline, ILI, EC_LOF table} joined table were the following:
+
+1. joining `Pipesegment_linear` from `ValidationData.gdb` of 2022 to `cleaned_ILI_2022.csv` (this is cleaned version of 2022's ILI data)
+2. spatialize the `EC_Risk_LOF` table by doing "display route events" in ArcMap
+3. Spatial join (1) and (2) -- this is the final table I've been using.
+
+Debugging process with Jackson:
+- Inspected the `(beginstationseriesid, beginstationnum, endstationnum)` for the table rows that have multiple `EC_LOF_xxx` values, from the 
+- Compare the triplet values against those present in the `EC_LOF` table itself.
+- Found that in the final table, the `(beginstationnum, endstationnum)` segments are longer than the individual segments in the `EC_LOF` table.
+  - Essentially, the pipeline segments in my result table merged multiple `EC_LOF` table segments, resulting in multiple risk values for pipe segments.
+
+
+Potential solution:
+1. We suspect it's because the `Pipesegment_linear` segments are labeled differently from the dynamic segments in the risk table.
+2. So the proper procedure would be...join `EC_LOF` to `Pipesegment_linear`.
+3. Then spatialize the ILI data onto (2).
+
+Not sure if makes sense, but can check if correct by comparing against the pipe segments in the original mariner `EC_LOF` tables.
