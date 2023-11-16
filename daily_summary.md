@@ -1728,3 +1728,37 @@ Potential solution:
 3. Then spatialize the ILI data onto (2).
 
 Not sure if makes sense, but can check if correct by comparing against the pipe segments in the original mariner `EC_LOF` tables.
+
+# 11/13/2023
+
+Updates on multiple things.
+
+## Volumetric loss 
+
+Corrosion engineering meeting take-aways:
+- Corrosion engineering currently DOES use the EC_LOF risk scores for deciding what pipelines to do further inspection.
+- The risk model pipe segments are still too large, however, and more finely grained criteria are needed, due to limited resources.
+- Additional requests to improve metal-loss based criteria:
+  - Use %-loss (width * length * depth_loss_%)
+  - Sum over all anomalies found per segment between girth-weld (40 or 80ft)
+
+## Foundry data ingestion updates:
+
+Updated notes on [ILI data](./FoundryOntologyNotes/ILI.docx), [Leakmaster](./FoundryOntologyNotes/Leakmaster.docx), and [CISRead dataset](./FoundryOntologyNotes/CISRead.docx).
+
+### ILI
+
+Going smooth -- ingestion will start soon. There won't be any alterations to the existing ILI data pipeline (from vendors to ILI team). The Foundry integration will ingest each year's csv file and append to the Foundry onotology object.
+
+### LeakMaster
+
+Identified ingestion target as the csv file generated from CSV. See diagram for current vs. (planned) Foundry pipeline.
+
+![Leakmaster](./assets/leak_master_data_pipeline_changes.png)
+
+### CISRead
+
+Settled on the consolidated CISRead table (merging DA and Corrosion Engineering datasets), and using GMCloud as the ingestion start point. See diagram for current vs. (planned) Foundry pipeline.
+
+![CISRead](./assets/cis_read_data_flow.png)
+
