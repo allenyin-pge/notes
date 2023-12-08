@@ -1762,3 +1762,84 @@ Settled on the consolidated CISRead table (merging DA and Corrosion Engineering 
 
 ![CISRead](./assets/cis_read_data_flow.png)
 
+# 11/21/2023
+
+The general flow of Foundry data integration:
+
+1. Identify dataset, business owner (people who wants to use it), SME and data owner (they can be the same).
+2. Identify how the dataset is generated, specify the ETL pipeline
+  - Identify if any steps in the process is present in Foundry already and can be reused.
+  - Identify how upstream to start the ingestion process, based on convenience and stability.
+3. Figure out the input data schema (columns, values, primary key, etc)
+4. Figure out the transformation steps and final ontology schema.
+
+
+# 11/29/2023
+
+Leakmaster dataset problems:
+
+1. Logic and data sources for SAP -> CSV file transformation unknown and needs to be tracked down.
+
+__Leakmaster "duplicate" leak numbers__
+
+> It seems like sometimes SAP can emit duplicate leak events (with same leaknumber as a previous one), due to SAP workings. Here I define “event” as data associated with a specific leak report.
+
+> Note that this is not the same as a leak being reported at the same location twice — in that situation two events with different leaknumber will be stored in SAP.
+
+>The confusion is on how to deal with ingesting events whose leaknumber already exists in the foundry dataset.
+
+> Currently Miguel would manually check the new event with the duplicate leaknumber and decide whether it’s safe to ignore — if yes, it gets ignored. Otherwise, it gets either replaced or added to some logic.
+
+> The caveat here is we probably don’t just want to do row replacement whenever an event with the same leaknumber occurs, because we don’t understand what might be causing this duplication in SAP.
+
+> So I think there are a few ways to approach this:
+> 1) figure out why duplicate leaknumber might happen in SAP and write logic to deal with them appropriately
+> 2) In the periodic SAP data ingestion process, add a step such that any duplicate between the newly ingested data and the final QC’d leakmaster dataset are flagged for manual review.
+
+__Leakmaster dataset QC involves other data sets__
+
+The SAP data associated with the leak events are cross checked with other data sources, for example gtgis in arcmap is used to convert the lat/long in the reported leak event to actual pipeline locations, pipeline pfl to verify pipe characteristics (coating, thickness, etc).
+
+Depending on these cross references, the data that enters into the final qc’d leakmaster dataset may be updated from the original SAP values.
+
+So the bottom line is, the logic to merge SAP leak data into the final qc’d leakmaster dataset contains steps that involves a bunch of other datasets, that may or may not be currently present in Foundry right now.
+
+Miguel and I will try to compile a list of these steps and the different datasets needed for our meeting next week. Even if it’s not complete, I realize this might change the work plan quite a bit as maybe new datasets might need to be ingested and it’s unclear whether that will be out of scope for this project.
+
+__Note on SAP data__
+
+Leakmaster data comes from SAP post-2014.
+
+# Week of 12/4
+
+## Leakmaster ingestion:
+
+Need to find out how the monthly export from SAP is generated from SAP, the 
+Foundry ingestion process should start from as upstream as possible.
+  - Emailed **Brady Goodwin**, as he sends the monthly export to Steven.
+
+Additional knowledge about Leakmaster data set...
+1. Monthly review process started in 2014, not sure how data enters into the dataset prior to that.
+2. Leakmaster dataset has rows that might not have SAP leak number, such as in 2014, and from processes other than Miguel's monthly leak review process.
+3. Other people/processes can edit/enter data into the Leakmaster dataset, e.g. Thien-An, need to eventually understand those processes.
+
+Therefore, we are now dividing the Leakmaster data into two types:
+1. SAP-derived leaks: This go throug the monthly review process, which we understand well, thanks to Miguel.
+2. Non-SAP derived leaks: Lots of processes with this one, punt to take care of later.
+
+Till EOY2023, Leakmaster Foundry ingestion will have two steps:
+1. Ingest the Leakmaster dataset and update it monthly with the newly added entries as is.
+2. Establish the SAP-derived leaks process, incorporating the monthly review process.
+  - In the event of entries with duplicate SAP leaknumbers, the process calls for them to be ignored.
+  - Use the "master index" as the primary key.
+
+## ILI ingestion
+
+Even the Satvinder processed ILI tally can have duplicate rows, and other problems. But Foundry will first ingest them as is (raw), then apply data cleaning and transformation to yield a cleaned version.
+
+## Xodus modeling
+
+Gordon informed me that the company Xodus wants to help us build risk models for free, but they obviously need data, etc.
+
+This will require us sharing the relevant data sets (raw or the processed data from the risk model runs?)
+- Also need to have NDA and data sharing plans in place. Need to ask Steven Hui and contact legal (Andrew Tran) about it.
