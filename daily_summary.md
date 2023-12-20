@@ -1879,10 +1879,15 @@ So how does this inform our work?
 
 # Week of 12/11/2023
 
+Updated all Foundry data set before/after processes [here](https://pge-my.sharepoint.com/:p:/p/a1yu/EQrwiB3S9x9HkD3lsxxrZtAB-G2Sjc6MEnyeDlPgkQetWg?e=UGPB6m).
+
 TODO:
-1. Time sheets
-2. MOC training
-3. Update Foundry work notes
+1. ~~Time sheets~~
+2. ~~MOC training~~
+3. ~~Update Foundry work notes~~
+4. Write Retro for Foundry process
+    - ~~Make updated before/after Foundry flow process: 12/22/2023~~
+5. Make numerical examples for corrosion engineering
 
 ## ILI ingestion
 
@@ -1893,6 +1898,52 @@ Done!
 ## Xodus
 
 Looks like we'll have to go through sourcing, legal, etc., before being able to get the whole thing started. Starting before end of year seems unlikely.
+
+### Kickoff meeting notes
+
+Jill has background in nuclear engineering probabilistic modeling -- pipeline for water cooling. Also a lot of risk analytics in other pielines.
+
+__Proposed work__
+
+Background: Have done a previous pipeline PRM, but don't have direct engagement with client.
+
+Want to start with a certain segment, demonstrate PRM value and figure out time it takes. Want to collaborate to figure out:
+  - What pipelines to do, how many miles?
+  - What concerns do you have?
+  - My related question: What kind of data would you need, how do you validate it?
+
+Brian's question: Past problems with not having enough data to calibrate/validate the risk model, not enough data to figure out the component probability distributions.
+  - Jill: Does data model represent the systems? No numbers...use generic probability distributions. Want to bring more people to go through models and try to understand the validity.
+  - Follow-up question: How to validate the model is correct? Do uncertainty analysis and check how they change the model outputs. Check how much confidence models assign to historical accidents.
+
+Data challenges: For unpiggable lines, use attachment-3 models based on SME and mechanistic understanding.
+  - Jill mentions the challenge of extrapolating known pipeline data to unknown pipeline data. Suggests as the model matures, this capability increases.
+  - Relatedly, Bronson suggests pick two routes that are "similar" in risk profile. One has good ILI data, the other doesn't.
+      - Jill also mentions needing human operations data, weather, etc. But we might not have those data available..
+
+Jill wants to have the raw ILI data to use the uncertainty to feed into the PRA models (use event-tree?).
+
+__How does the project need to go?__
+
+1. Share our attachment3 models and mechanism understanding, figure out event tree.
+2. Do a data audit on whatever is needed, what we have available, and figure out what data gaps need to be filled.
+
+
+__Timeline__
+
+1. Get NDA in place -- need line of business to ok it (Bronson, Chris, etc)
+2. Share procedures
+3. Do a data audit. 
+4. Prioritization of data sources and do scope reduction..?
+5. Want regular communications of their work..
+
+__Data sharing__
+
+- Need NDA to share procedures which contains the model mechanics, calculations, and procedures.
+- Data sources that feed into our risk model
+- Operation procedures, historical changes, etc.
+  - Brian says use MAOP assumption
+- Use "CAFTA" for model calculation and data-ingestion (used by nuclear and wildfire).
 
 ## Leak master
 
@@ -1923,3 +1974,33 @@ Phase 3 probably requires more scoping work.
  
 This way we can have deliverables for this quarter's hardwork and have more time for the extra work. The leakmaster process is complicated and right now it doesn't seem like automating the entire process is realistic.
  
+### Update
+
+- Phase 1: Just ingest the Leakmaster dataset and update every month. Miguel's workflow doesn't change.
+- Phase 2: All SAP-related work will be here, including the SAP--> monthly leak repair csv file process.
+- Phase 3: Everything else, connecting the monthly review logic to the final Leakmaster dataset.
+
+## CISRead
+
+Pretty much done. There are columns that require data cleaning, however, and it was decided that they should be updated upstream in the geo-data bases (prior to GMCloud).
+
+See updated pipeline understading figure:
+
+![Updated CISRead](assets\CISRead_flow_updated.png)
+
+## Steering Committee Meeting planning
+
+1. Need to show performance measurements for EC.
+2. How to show risk assessment for SCC is working?
+    - Problem: SCC events are sparse, make it hard for model validation.
+    - Possible approaches:
+        - Verify SCC frequency increase with time (assumption checking)
+        - Check other assumptions in the SCC threat flow-chart.
+        - Run known SCC events through the flow-chart, and see if there are more event counts in strong than moderate, than no threat to identify flow-chart consistency.
+
+
+# Week of 12/19/2023
+
+## Work on Performance Metrics
+
+## Going over data flow audit with Kiana
