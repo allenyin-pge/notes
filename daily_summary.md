@@ -938,7 +938,7 @@ Depending on the category of the reported anomalies, immediate and/or scheduled 
 
 The purpose of this step is to identify any reported anomalies that require excavation because they potentially pose a threat to the integrity of the pipeline.
 
-All cracks or crack-like indications >70% through wall must be considered Immediate Anomalies and excavated, regardless of calculated failure pressureA
+All cracks or crack-like indications >70% through wall must be considered Immediate Anomalies and excavated, regardless of calculated failure pressure
 
 Steps (Many data is collected -- good for modeling and groud-truth confirmation..maybe on cracked parts)
 - Non-destructive examinations
@@ -1561,7 +1561,7 @@ I can do this because `EC_Risk_LOF` segments are sub-segments of the pipeline se
 
 # 10/4/2023
 
-## Spatial join goodness
+## Spatial-join-goodness
 
 The spatial join crashed...have to redo it again. But just as a reminder of the procedures taken to join `EC_Risk_LOF` segments with the pipeline segments.
 
@@ -2003,4 +2003,25 @@ See updated pipeline understading figure:
 
 ## Work on Performance Metrics
 
+Here are the correct steps to get the spatial-join to work such that the ILI anomaly events are mapped to the same dynamic segments as the EC_LOF table.
+
+0. Import the `EC_Risk_LOF` Table to `Validation.gdb` (follow step 1-3 in 10/4/2023 notes, section Spatial-join-goodness, step 1-3).
+1. Drag `EC_Risk_LOF` and `Pipesegment_linear` table to ArcMap's `Table of Contents` pane.
+2. Spatialize `EC_Risk_LOF` onto `Pipesegment_linear`("right click on table" -> "display route events"), results in `EC_Risk_LOF_Events`. See screenshot below:
+![spatializing EC to pipesegment](./assets/display_EC_LOF_events_on_PipeSegment_linear.png)
+3. Save this as shape file, and export it as a feature class into `Validation.gdb`.
+4. Create spatial index for this new feature class, following [this](https://support.esri.com/en-us/knowledge-base/how-to-build-a-spatial-index-for-a-shapefile-000006147). It's important to create spatial index for everything we spatial-join together, otherwise it'll take forever (more than 30 hours!!)
+5. Export the `CleanedILI_2022` shapefile (created from 9/27/2023 steps 1-3) as a feature class into `Validation.gdb`, create spatial index for it.
+6. Drag the feature class into the content pane.
+7. Spatial-Join `EC_Risk_LOF_Events` to `cleaned_ILI_2022`. In GIS lingo:
+  - Target=`cleaned_ILI_2022`, which are point features
+  - Join feature=`EC_Risk_LOF_Events`, which are line features.
+8. After this, the result is `SJ_target=ILI_join=EC_spatialized_to_Pipesegment` and is displayed in the screenshot below:
+![final result](./assets/success_EC_Risk_LOF_ILI_spatial_join.png)
+9. We can check that the segments in the EC_Risk_LOF table are properly joined with the ILI anomalies by selecting all rows with the same `beginstationseriesid` (39887 in screenshot), sorting the `beginstationum` and check the correspondence between the different attribute tables (shown in screenshot).
+
 ## Going over data flow audit with Kiana
+
+Try to do data set aggregation summary. See [slides](https://pge-my.sharepoint.com/:p:/p/a1yu/EbzvfKsD3o9DohLAGSyBFCcB6HFnWQsofN7WYjRwm9MLrw?e=vB26Ir) for instructions and the framing of the problem.
+
+Kiana will provide a list of raw and intermediate datasets, which we can prioritize for Foundry ingestion based on degree of dependences. I can then use this to provide recommendations for Foundry team next year.
