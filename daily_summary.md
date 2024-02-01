@@ -1945,7 +1945,7 @@ __Data sharing__
   - Brian says use MAOP assumption
 - Use "CAFTA" for model calculation and data-ingestion (used by nuclear and wildfire).
 
-## Leak master
+## LeakMasterUpdateDec2023
 
 I went through Miguel's [process document](./FoundryOntologyNotes/Monthly&#32;Leak&#32;Process.pdf), and some of Steven's [doc](./FoundryOntologyNotes\FD&#32;CR&#32;108149642&#32;Leak&#32;Data&#32;Report&#32;Program&#32;for&#32;TIMP&#32;Annual&#32;Risk&#32;Analysis_V1.2.docx) and compiled the following [notes](./FoundryOntologyNotes\leakmaster_monthly_review_process_notes.docx)
 
@@ -2025,3 +2025,127 @@ Here are the correct steps to get the spatial-join to work such that the ILI ano
 Try to do data set aggregation summary. See [slides](https://pge-my.sharepoint.com/:p:/p/a1yu/EbzvfKsD3o9DohLAGSyBFCcB6HFnWQsofN7WYjRwm9MLrw?e=vB26Ir) for instructions and the framing of the problem.
 
 Kiana will provide a list of raw and intermediate datasets, which we can prioritize for Foundry ingestion based on degree of dependences. I can then use this to provide recommendations for Foundry team next year.
+
+# Week of 1/29/2024
+
+First update of the new year!
+
+## Kiana's data flow audit and ingestion recommendation
+
+Compiled data source/flow [spreadsheet](https://pge.sharepoint.com/:x:/r/sites/TIMPRisk/_layouts/15/Doc.aspx?sourcedoc=%7B935B3D97-21EC-44DC-AA16-215E523330B9%7D&file=TIMP%20Risk%20Datasets%20to%20Foundry%20Recommendation.xlsx&action=default&mobileredirect=true).
+
+The idea of this process is documented [here](./assets/data_source_audit_flow.pptx)
+
+__Top recs:__
+
+1. ILI Pipeline Tally, CIS Read Dataset, Leak Master
+    - Part of 2023 Migration to Foundry Ontology Effort
+2. H-forms from TCAT (Inspection data)
+    - Feeds into 4 Factors, 6 Mariner Tables, 12 Mariner columns, 4 Locations (i.e. “Intermediate Sources”)
+    - Can try to directly connect H-forms from TCAT to Foundry?
+3. A-forms from SAP (Inspection data)
+    - Feeds into 4 Factors, 6 Mariner Tables, 3 Mariner columns, 2 Locations (i.e. “Intermediate Sources”)
+    - Can try to directly connect A-forms from SAP to Foundry?
+4. GTGIS
+    - Feeds into 4 Factors, 6 Mariner Tables, 3 Mariner columns, 2 Locations (i.e. “Intermediate Sources”)
+    - GTGIS to Foundry ingestion is underway for certain datasets. Need to figure out which ones we need (Kiana to continue this).
+5. Corrosion Program Spreadsheets
+    - Feeds into 5 Factors, 4 Mariner Tables, 6 Mariner columns, 5 Locations (i.e. “Intermediate Sources”)
+    - Different spreadsheets for Casing, Atmospheric Corrosion, DC Interference, and MIC. Uses Power BI for Soils data.
+    - Need to figure out how these spreadsheets are derived from upstream datasets.
+
+## Gas Data Management (GDM) and Foundry Ontology (Ontology) team
+
+I was surprised when Gary Singh from the GDM team reached out to me about a "TIMP Risk Analytics project", which essentially wants to replicate the risk modeling process in Foundry. This is great, but the plan seemed to underestimate the efforts required by orders of magnitude, and the claims about 60% of data needed already present in Foundry doesn't seem right. Clearly there was some disconnect between the different programs...and how does this relate to all the data ingestion work the Ontology team's helping me with?
+
+Getting GDM (Alec McCullick), Ontology team (Archana Kumari, Jayna Thanki, and others I've worked with during Foundry data ingestion), and Gordon on TIMP, we (mostly me, apparently everybody knew what's going on lol) figured out the following:
+
+- The "TIMP analytics" project was initiated from a project proposal back in 2020/2021. As Gordon mentioned, we currently have New Century to do what was asked back then, so that proposal is now obsolete (although I'm not exactly sure what was asked).
+- The normal flow of things for Foundry-related projects are:
+  - Talk to GDM/Alec about some need and requirement
+  - If data-ingestion related, gets routed to Foundry Ontology team
+  - Do stuff...
+  - In generaly GDM gate-keeps the ontology team's work stream.
+- But apparently Bronson has made us special and TIMP gets blanket approval with data ingestion, so:
+  - If it's data PRODUCT-related, talk to Alec, it gets listed into some work prioritization list, then things proceed -- GDM figures out resources (i.e. who can help and when)
+  - If it's data-ingestio related, just to to Foundry Ontology team directly, and get it fit into their work stream
+- Gordon brought up the issue of asset lineage tracking in GTGIS: i.e. if part of a pipe gets replaced, it gets a different asset ID in GTGIS from the original pipeline, and we need to currently manually do snapshot comparisons to infer lineage.
+  - This is doable in Foundry but would require some work.
+  - This for example, is a project that can receive support from GDM, and Alec will bring this up in their "governance meeting" as a use case/product work.
+
+### Possible GDM "Products"
+
+Alec got interested in the GTGIS pipeline lineage issue when Gordon brought it up (as something TIMP has to fix ourselves) and wanted to explore that as a potential project.
+
+More details on the __GTGIS pipe lineage problem__:
+
+> tracking lineage primarily focuses on assets that didn't get replaced and stayed in the ground. They might have been split because a short replacement project or a valve install occurred in the middle. They might have been moved because Mapping made changes based on new GPS data or pipe length data. I think this is not an easy project for Froundry since there are many variables, both spatial coordinates and attribute data. For example if part of the logic is to compare attribute data to identify matching assets between two snapshots, it is possible some attributes have been updated by Mapping. Currently we do a purely spatial matching for most uses, but for manufacturing threat we also try to match pipeline feature number, but sometimes these get updated by Mapping and that throws off the comparison.
+
+So I think the right way to approach is to consider:
+1. Under what circumstances can pipe lineage be broken? And how they can be fixed?
+2. Compare the current methods/logic employed by TIMP and any other way to abstract the commonalities to find a more general solution.
+3. Explore what methods are possible in Foundry and whether a general solution is possible.
+
+Very typical problem-solving process, but as we'll be working in a new environment, it's important to make this a case study.
+
+__Additional automation projects__
+
+1. Structure IOC calculation:
+  - > It's a very computationally intensive run and now we no long have the ability to run the FME script through the IT O&M team
+2. Fatigue claculation based on the rainflow model
+3. Network tracing:
+  - > (for customer count, SCC temperature, and IC accumulation point) but since we don't have a full connectivity model of the system this might not be doable for the Foundry team.
+4. Tracking and possibly correcting PFL feature number issue:
+  - > that would really help with manufacturing data ingestion since that threat relies so much on linking feature numbers with input data
+
+Gordon also listed two great resources:
+
+1. [TIMP 2022 Functional Technical Design Document](https://pge-my.sharepoint.com/:w:/p/ghy1/EY1sggIVpIVCi1GMUd8b6GIBt4vTSf5ng4NJzifQeA8zJQ?e=CQmLFF):
+    - The specific project is __`Data Loader for TIMP Quantitative Risk Model Enhancement 2022`__
+    - Contains all the FME script requirements for pre-processing data to/from MarinerDB
+    - #TODO: Are these scripts we currently use? Are they used with New Century tool?
+2. [Risk assessment factor calculations](file://ffshare01-nas/RiskMgmt/RISK%20THEMES/2023/2023%20Risk%20Assessment/RMI-02/):
+    - These files document how different factors involved in the risk model are calculated, describes the datasets used, how they are processed, the calculations involved and associated rationale.
+    - #TODO: If we can essentially replicate the described functions in Foundry, does that mean we have replicated the risk modeling process then?
+
+__My assessment of roadmap for Foundry-based risk process__
+
+There are primarily three things we need for this to work:
+1. **Data ingestion of primary sources**: This deals with identifying the upstream primary data sources (A-form, H-form, GTGIS, ILI tally, etc) that are needed, and ingesting them into Foundry in a way such they are complete, reusable, and easy to check correctness and integrity.
+2. **Transformation to intermediate datasets from primary sources**: This deals with data cleaning (i.e. GTGIS pipe lineage tracking, Leakmaster, center-line alignment) and preprocessing that's needed. This will often start to involve combination of multiple datasets.
+    - We can consider this step as "products" already. But their outputs aren't directly actionable products (i.e. lineage tracking INDIRECTLY serve business purpose and field actions).
+    - This should be a separate phase but the pipeline building and validation process can be significant.
+3. **Final actionable analytics product**: Results of these pipelines are directly actionable, such as risk model scores leading to field work.
+    - The end results are often subject to compliance and regulations.
+    - > other pipeline operators using Foundry to do subpart O compliance work with models similar to ours in terms of the kinds of data used.
+
+As an example, the different phases of the leakmaster dataset ingestion/replication [process](##LeakMasterUpdateDec2023) can be seen to involve both (1) and (2).
+
+## Actionables:
+
+__Foundry-related:__
+- Check in Foundry if existing ontology/datasets (i.e. H-form, A-form, GTGIS tables) are sufficient.
+    - Target EC model use cases: Get Kiana help here too
+    - Use Collibra to check dataset description metadata.
+        - Collibra: Ask Matt Siegmund for access. Example to follow
+    - Deadline: 2/16/2024
+- Start work on building corrosion volumetric loss results in Foundry from ILI data.
+  - Talk to Satvinder about using the same spatial overlay?
+  - Onboard Kiana here too
+  - Deadline: 2/16/2024
+- Figure out prioritization for automating modeling processes in Foundry -- which ones to prioritize?
+  - Meeting with GDM/Alec
+
+__Modeling-related:__
+- Finish compiling EC model-performance results for steering committee: go through a few more years' data, high priority
+  - Deadline: 2/9/2024
+
+__Direction:__
+- Make slides about probabilistic modeling course learnings:
+  - Deadline: 2/23/2024
+- Write roadmap/strategy for automating risk modeling, model measurement, and data-driven models. Have Gordon help with this.
+  - Deadline: 2/23/2024
+
+
+
+                                                               
