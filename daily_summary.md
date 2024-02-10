@@ -2108,6 +2108,26 @@ Gordon also listed two great resources:
     - These files document how different factors involved in the risk model are calculated, describes the datasets used, how they are processed, the calculations involved and associated rationale.
     - #TODO: If we can essentially replicate the described functions in Foundry, does that mean we have replicated the risk modeling process then?
 
+On possibly moving all the risk process into Foundry, naturally Gordon has some resevations since we recently invested a lot into the New Century tool. And On the question of if we can replicate the described FME scripts in Foundry, whether that means we have replicated the risk modeling process, Gordon explains:
+
+> The FME scripts are still used, but in 2023 I had to use ArcGIS scripting to do 22 scripts since the IT O&M team did not have the ability to make tweaks and fix issues in FME, unlike prior years when we had the funding for a dedicated IT FME team. We want to retire the FME processing entirely within a year or two.
+
+> The New Century tool will be able to incorporate some of the simpler FME scripts into the risk/threat models, this has the benefit of being able to run end to end updates with the push of a button. However the New Century system will not be able to run the most complex logic like the ones I mentioned (don't know exactly where the cutoff is at this point). Therefore Foundry is a good place to re-program these processing logic. There is a timing requirement: our internal team needs to be able to make logic updates fairly quickly to meet the timing of the annual compliance risk run.
+
+> If all the FME scripts are processed by Foundry, building a risk model on top of these data tables would basically be duplicating the New Century models. However, there are benefits of the New Century tool that Foundry may not have. The New Century tool allows scenario analysis (i.e. change of MAOP, pipe specs, or simulating data improvement), and also allows any engineer who has the software to make logic changes as a way to pilot new ideas. Another benefit that comes with the New Century platform are the alignment sheet (maps with data tables) and dashboard tools
+
+> I also have doubts about the level of cost for Foundry and the ability of our team to have full and quick ability to make changes (i.e. schema changes and logic changes). Our compliance timing requires this flexibility. Another significant issue is whether Foundry can do dyanmic segmentation at all. This is a deal breaker - not having this ability means it will not do what the New Century tool can.
+
+> New Century has an ongoing contract for 2024. Support will probably be on demand in the future. My plan is to do the rest of the feasible FME scripts on the New Century platform ourselves, following the 6 examples they develop this year. The New Century support contract is very reasonably priced too. I don't see the benefit of spending on Foundry to duplicate the work (waste elimination means no duplication), if TIMP will be on the hook for the software developer cost.
+
+> I see the role of Foundry in sharing our risk results to execution and other downstream teams, and cleaning up input data if there is need to improve data quality.
+
+- Everyone can agree that Foundry is a good place for data integration, but not necessarily for running the risk process throught.
+- The reservations are due to development ease and extra cost.
+- This all makes sense, and it will be a gradual process to migrate the risk modeling workflows without breaking things.
+- At the minimum, we need to enable New Century to be able to talk to Foundry, which is certainly doable.
+
+
 __My assessment of roadmap for Foundry-based risk process__
 
 There are primarily three things we need for this to work:
@@ -2145,6 +2165,64 @@ __Direction:__
   - Deadline: 2/23/2024
 - Write roadmap/strategy for automating risk modeling, model measurement, and data-driven models. Have Gordon help with this.
   - Deadline: 2/23/2024
+
+
+# Week of 2/5/2024
+
+Update on actionables from last week, and additions:
+
+__Foundry-related:__
+- Check in Foundry if existing ontology/datasets (i.e. H-form, A-form, GTGIS tables) are sufficient.
+    - Target EC model use cases: Get Kiana help here too
+    - Use Collibra to check dataset description metadata.
+        - ~~Collibra: Ask Matt Siegmund for access. Example to follow~~
+        - Collibra currently still lacking many dataset descriptions, their team is under-water, help when they reach out.
+          - Satvinder passed along the ILI column description to them
+    - __GTGIS tables__: Kiana has compiled from Gordon a list of tables that our current risk process uses. But the way risk model process address get this data is through querying the snapshot stored on TIMP Oracle DB. Need to work out how to cross-check the tables in there vs. in Foundry
+      - Figure out Snapshot process, contact Brian P. (what's last name?)
+    - __H Forms__: Check out the datasets in Foundry, make sure they are validated and QC'd.
+    - __Deadline:__ 2/16/2024
+- Start work on building corrosion volumetric loss results in Foundry from ILI data.
+  - Talk to Satvinder about using the same spatial overlay?
+  - Onboard Kiana here too
+  - __Deadline:__ ~2/16/2024~, 2/23/2024
+- Figure out prioritization for automating modeling processes in Foundry -- which ones to prioritize?
+  - ~~Meeting with GDM/Alec~~
+  - Give GDM/Alec a list of dataasets I need them to ingest, along with the descriptions.
+  - __Deadline:__ 2/23/2024
+
+__Modeling-related:__
+- Finish compiling EC model-performance results for steering committee: go through a few more years' data, high priority
+  - Deadline: 2/9/2024
+
+__Direction:__
+- Make slides about probabilistic modeling course learnings:
+  - __Deadline:__ 2/23/2024
+- Write roadmap/strategy for automating risk modeling, model measurement, and data-driven models. Have Gordon help with this.
+  - __Deadline:__ ~~2/23/2024~~ 3/2/2024
+
+__Misc:__
+- Have a retro doc about Foundry ingestion process from last year
+- Make a document compiling all the new dataset resources and references.
+
+
+## Other notes:
+
+### EC Modeling ideas
+
+Chris Warner is interested in doing more data-drive EC risk modeling. Need to think about more ways to improve in this direction.
+
+1. 2SD corrosion criteria -- this is about to be implemented
+2. [Idea from Ian] Measuring data coverage: What percentage of pipelines are present in what datasets?
+3. [Idea from Ian] "Measure performance of the dataset":
+  - Compare the consistency between different EC datasets, assuming ground-truth of H-form and ILI.
+  - But this analysis can suffer from confounds though (e.g. anodic protection dataset is only accurate in wetter areas, so it'll involve mechanistic modeling to account for this.)
+4. What other (possibly shakier) risk modeling assumptions can we examine?
+    - Mitigation factors: How do they actually impact risk scores? For example, does ECDA provide any value compared to hydrotest? What are the effectiveness of each?
+      - This is important because knowing e.g. effectivness of ECDA vs. hydrotest can change budge request requirement.
+
+
+
 
 
 
