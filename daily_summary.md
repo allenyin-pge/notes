@@ -1289,7 +1289,7 @@ The first tab is how the Tally is delivered from the vendor and the second tab i
 
 Copying from chat with Jackson for easy reference:
 
-So regarding the actual data (suppose I'm looking into tstitinfdbsws010 or tstitinfdbsws009, MarinerDB_2022), how do I get:
+So regarding the actual data (suppose I'm looking into `tstitinfdbsws010` or `tstitinfdbsws009`, MarinerDB_2022), how do I get:
 
 - ILI failure pressure -- which table do you recommend I use? `POE_TRADILI_MATCHED_2022` or some other table? If the former, I'd have to map the flaw location to the pipeline segments that the LOF alg operates on.
   - Answer: Yes use `POE_TRADILI_MATCHED_22`
@@ -1501,8 +1501,18 @@ More problems with the data sets.
 See [notebook](https://github.com/allenyin-pge/ModelPerformance/blob/master/EC_LOF_and_cleaned_ILI.ipynb) for examination results. Current procedures used to get ILI anomalies matched with MarinerDB EC_LOF table results:
 
 1. Take Satvinder's All_ILIData.csv, extract the rows for ILI that was completed in 2022 --> call this `clean_ILI_2022.csv`
-2. In ArcMap, opened the `Pipesegment_linear` layer from the [`ValidationData.gdb`](\\rcnas01-smb\sysintegrity-fs01\SysIntegrity\RiskMgmt\SI\SME_Tables_RiskAnalysis\QRAD_2022\Validation\)
-3. Imported `clean_ILI_2022.csv` into ArcMap. To "Display as X/Y Data", convert lat/long to "Geographic coordinate system -> World -> WGS84". The layer overlay looks to be ok 
+2. In ArcMap, opened the `Pipesegment_linear` layer from the [`ValidationData.gdb`](\\rcnas01-smb\sysintegrity-fs01\SysIntegrity\RiskMgmt\SI\SME_Tables_RiskAnalysis\QRAD_2022\Validation\).
+    1. Copy the entire folder `...\Validation` over to local first so we can add/change things without screwing over everyone else.
+    2. Name it something useful, say `...\ModelValidation2022`.
+    3. In the catalog pane of ArcMap, add that folder under `Folder Connections`.
+3. Imported `clean_ILI_2022.csv` into ArcMap:
+    1. Ex: create a folder `...\ModelValidation2022\ILI_data`, then copy the csv file there.
+    2. Now drag that csv file into the Layers Pane.
+    3. To "Display as X/Y Data", choose `longitude` as `X`, `latitude` as `Y`. Then click `Edit` and pick `Geographic coordinate system -> World -> WGS84`. This will plot the anomaly as events with (X, Y) coordinates from pairs of longitude, latitude data. The layer overlay looks to be ok.
+        - Note that WGS1984 is a coord system used by generic GPS units and works world-wide.
+        - The coordinate system used within PGE is `GCS_North_American_1983`. This coordinate system and WGS1984 are compatible within Continental USA but not in rest of the world.
+        - For example, `Pipesemgent_linear` layer is in the NA1983 coordinate system.
+    4. We can export these events as its own shape file by right clicking the layer: `Data -> Export Data`, then choose the `Data frame` coordinate system -- this way it'll be saved in `GCS_North_American_1983` coordinates system and be compatible with everything else.
 4. Spatial joined `Pipesegment_linear` layer to `clean_ILI_2022` layer, with "each point be given all attributes of the line closest to it"
 5. The joined layer is exported as `cleaned_ILI_2022_joins_Pipesegment_linear.csv` It now has attributes "route", "beginstationseriesid", "endstationseriesid", "beginstationum", "endstationnum".
 
@@ -2014,9 +2024,9 @@ Here are the correct steps to get the spatial-join to work such that the ILI ano
 5. Export the `CleanedILI_2022` shapefile (created from 9/27/2023 steps 1-3) as a feature class into `Validation.gdb`, create spatial index for it.
 6. Drag the feature class into the content pane.
 7. Spatial-Join `EC_Risk_LOF_Events` to `cleaned_ILI_2022`. In GIS lingo:
-  - Target=`cleaned_ILI_2022`, which are point features
-  - Join feature=`EC_Risk_LOF_Events`, which are line features.
-8. After this, the result is `SJ_target=ILI_join=EC_spatialized_to_Pipesegment` and is displayed in the screenshot below:
+    - Target=`cleaned_ILI_2022`, which are point features
+    - Join feature=`EC_Risk_LOF_Events`, which are line features.
+8. After this, the result is `SJ_target=ILI_join=EC_spatialized_to_Pipesegment.shp` (don't need to save in `ValidationData.gdb`) and is displayed in the screenshot below:
 ![final result](./assets/success_EC_Risk_LOF_ILI_spatial_join.png)
 9. We can check that the segments in the EC_Risk_LOF table are properly joined with the ILI anomalies by selecting all rows with the same `beginstationseriesid` (39887 in screenshot), sorting the `beginstationum` and check the correspondence between the different attribute tables (shown in screenshot).
 
@@ -2222,6 +2232,48 @@ Chris Warner is interested in doing more data-drive EC risk modeling. Need to th
       - This is important because knowing e.g. effectivness of ECDA vs. hydrotest can change budge request requirement.
 
 
+# Week of 2/21/2024
+
+## EC Model Performance continued
+
+### Redo the process for 2021
+
+Outlining procedures briefly for this entire workflow:
+
+1. Extract ILI tally entries corresponding to 2021.
+    - Originally tried using Foundry, but I don't have permission to download the filtered data. And apparently data can only be downloaded 10k rows at a time (there are 30k+ rows for 2021), so not great.
+    - Ended up reusing my [notebook](https://github.com/allenyin-pge/ModelPerformance/blob/master/segmenting_ILI_excel_sheet.ipynb) instead to do it locally from the `All_ILIData.csv` instead.
+    - Saved it somewhere as `cleaned_ILI_2021.csv`.
+2. Copy over 2021's data prep ArcMap database:
+    - Copy 2021's geodatabase: `\\rcnas01-smb\sysintegrity-fs01\SysIntegrity\RiskMgmt\SI\SME_Tables_RiskAnalysis\QRAD_2021\Validation\` to local folder.
+    - Name it `...\ModelValidation2021`.
+    - In the catalog pane of Arcmap, add that folder under `Folder Connections`.
+3. Expand `...\ModelValidation2021\ValidationData.gdb`, and drag `Pipesegment_linear` layer to the content pane. This will render the pipe segments as lines.
+4. Create `...\ModelValidation2021\ILI_data`, copy over the previously created `cleaned_ILI_2021.csv`.
+    - Now in ArcMap, we can drag the `...\ModelValidation2021\ILI_data\cleaned_ILI_2021.csv` to the content pane.
+    - Right click the csv file, then `Display as X/Y Data`. choose `longitude` as `X`, `latitude` as `Y`. Then click `Edit` and pick `Geographic coordinate system -> World -> WGS84`.
+    - This will then overlay the ILI anomaly as points on top of the `Pipesegment_linear` layer as points.
+5. Right click on the `cleaned_ILI_2021.csv Events`, then `Data -> Export Data`. In the menu, chose the `Source data` coordinate system, and save it as shapefile in `...\ModelValidation2021\ILI_data\cleaned_ILI_2021.shp`.
+    - It's important to choose `Source data` coordinate system. Choosing `Data Frame` option ended up making the saved feature class offset from the original coordinates, and subsequent spatial joins will fail.
+6. Connect to MarinerDB2021:
+    - Assume SQL database for MarinerDB are established (search notes for "Get access to data base" for info)
+    - In ArcMap catalog pane, click `Database connections -> Add Database Connection`
+    - Chose `tsitinfdbsws008`, and use `Operating System Authentication` for authentication
+    - In `Database` dropdown, wait for it to populate and then choose `MarinerDB_2021`.
+7. In the `MarinerDB2021`, right click the table `MarinerDB_2021.dbo.EC_Risk_LOF`, then `Export > To Geodatabase (Single)`. Then in the resulting diaglog choose the Folder connection's `ValidationData.gdb` as the source.
+
+Now follow all the steps in "Week of 12/19/2023, Work on Performance Metrics"
+
+For 2021, the step of spatial joining `EC_Risk_LOF_Events` (line features) to `cleaned_ILI_2021` (point features) using the dialog from layer context menu (i.e. right click on the `cleaned_ILI_2021` layer, also so [this](https://support.esri.com/en-us/knowledge-base/bug-spatial-join-with-large-datasets-fails-to-complete-000009130)) fails because there are too many rows in the tables.
+
+Instead, go to `Geoprocessing -> Search for tools`, type in `Spatial Join` and pick that. The parameters are:
+- Target = `cleaned_ILI_2021` layer
+- Join feature = `EC_Risk_LOF_Events` layer
+- Join type = `JOIN_ONE_TO_ONE` (convert ILI data to NAD 1983 coord?)
+- Match option = ~~`INTERSECT`~~, `CLOSEST`
+- Save to `ValidationData.gdb`
+
+Note if the spatial join results frequently have the columns from the target features missing, this might indicate a coordinate problem. Check for this by drawing both the target and join feature classes and see if they actually overlap!
 
 
 
