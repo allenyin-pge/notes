@@ -2232,7 +2232,7 @@ Chris Warner is interested in doing more data-drive EC risk modeling. Need to th
       - This is important because knowing e.g. effectivness of ECDA vs. hydrotest can change budge request requirement.
 
 
-# Week of 2/21/2024
+# Week of 2/12/2024
 
 ## EC Model Performance continued
 
@@ -2274,6 +2274,18 @@ Instead, go to `Geoprocessing -> Search for tools`, type in `Spatial Join` and p
 - Save to `ValidationData.gdb`
 
 Note if the spatial join results frequently have the columns from the target features missing, this might indicate a coordinate problem. Check for this by drawing both the target and join feature classes and see if they actually overlap!
+
+Notes about weird things that can happen:
+1. **Missing stationing variables in spatial-joined result**: Sometimes we have rows with no stationing variables, this is when ILI and EC_LOF table don't overlap. Usually these rows correspond to ILI entries where the longitude/latitude in ILI data is invalid (i.e. all 0's). You can check these by looking into the corresponding entries in the original data table or file.
+2. **Total ILI distance calculations**: After spatial-joining the EC_LOF values to ILI, for each ILI anomaly entry, it's assigned the EC_LOF table's attribute values corresponding to the EC_LOF dynamic segment including said anomaly.
+    - Method1: Calculate total ILI distance from unique route mile marker (`route`, `MP1`, `MP2`) from ILI tally (how Satvinder calculates total ILI distance for a given year). Note the units here are in miles.
+    - Method 2: Calculate total ILI distance based on `(beginstationseriesid, beginstationnum, endstationnum)` from risk model's dynamic segment. The distance (`endstationnum - beginstationnum`) unit is in feet, REMEMBER to convert to miles after summing!
+    - Method 1 result doesn't have to be the same as Method 2, rather `result_method1 >= result_method2`, for the following reasons:
+      - During ILI, the inspection does different segments of a route. Each continuous segment of route inspected is identified by the MP1 and MP2 values on that route.
+      - Each anomaly entry in ILI happens within one of these continuous segments.
+      - EC Risk table uses stationing to identify segments of pipes, these can be of finer resolution compared to the continuously inspected segments.
+      - So when the distance calculated from the stationing variables assigned to each anomaly is LESS than that calculated from the ILI MP1/MP2 values, that means there are significant chunks of inspected pipes where there are no anomaly found.
+
 
 
 
