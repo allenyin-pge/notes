@@ -115,40 +115,40 @@ Git:
 
   ![github-screenshot](./assets/github_pge.png)
 
-  # 6/26/2023
+# 6/26/2023
 
-  ## Accounts:
+## Accounts:
 
-  All the github and wiki requests have been approved.
+All the github and wiki requests have been approved.
 
-  ### Git:
-  - Click on the email that invited to join `pgetech` github project.
-  - Set up 2fac with Microsoft Authenticator app on the phone.
-  - Follow steps on the wiki page [here](https://wiki.comp.pge.com/display/CCE/GitHub+-+Create+Personal+Access+Token) to generate personal authentication token and use for PGE SSO -- remember to rotate token every 90 days!!!
-  - Join the `TIMP Risk ML-Team` on github: click on `pgetech` organization from profile (see screenshot), then `view organization` -> `Teams` -> `Search` for "TIMP" to join.
-  ![github-screenshot2](./assets/github_teams1.png)
-  - One of the team members will grant access.
-  - Now we can see all the repositories belonging to the team [here](https://github.com/orgs/pgetech/teams/timp-risk-ml-team/repositories).
+### Git:
+- Click on the email that invited to join `pgetech` github project.
+- Set up 2fac with Microsoft Authenticator app on the phone.
+- Follow steps on the wiki page [here](https://wiki.comp.pge.com/display/CCE/GitHub+-+Create+Personal+Access+Token) to generate personal authentication token and use for PGE SSO -- remember to rotate token every 90 days!!!
+- Join the `TIMP Risk ML-Team` on github: click on `pgetech` organization from profile (see screenshot), then `view organization` -> `Teams` -> `Search` for "TIMP" to join.
+![github-screenshot2](./assets/github_teams1.png)
+- One of the team members will grant access.
+- Now we can see all the repositories belonging to the team [here](https://github.com/orgs/pgetech/teams/timp-risk-ml-team/repositories).
 
-  ### Powershell and VSCode
+### Powershell and VSCode
 
-  PGE has weird regulations for laptop, extra hacks have to get around these things...
+PGE has weird regulations for laptop, extra hacks have to get around these things...
 
-  1. Install `git` and `vim` via `itstore` -- chose `github git` and `gvim` -- wait for all that to finish.
-  2. Set Powershell alias:
-      - First create the powershell profile: `new-item -type file -path $profile -force`
-      - Set `vim` as default editor (could be notepad): `set-alias vim 'C:\Program Files (x86)\Vim\vim80\vim.exe'`
-      - Do `vim $profile` and enter the following:
-      ```
-      set-alias vim 'C:\Program Files (x86)\Vim\vim80\vim.exe'
-      set-alias l 'ls'
-      set-alias c 'clear'
+1. Install `git` and `vim` via `itstore` -- chose `github git` and `gvim` -- wait for all that to finish.
+2. Set Powershell alias:
+    - First create the powershell profile: `new-item -type file -path $profile -force`
+    - Set `vim` as default editor (could be notepad): `set-alias vim 'C:\Program Files (x86)\Vim\vim80\vim.exe'`
+    - Do `vim $profile` and enter the following:
+    ```
+    set-alias vim 'C:\Program Files (x86)\Vim\vim80\vim.exe'
+    set-alias l 'ls'
+    set-alias c 'clear'
 
-      function u { set-location .. }
-      function src { . $profile }
-      function rc { vim $profile }
-      ```
-  3. Do basic vim settings ...unfortunately I can't edit the `vimrc` settings in `$VIM` (in program files), and this makes me very frustrated.
+    function u { set-location .. }
+    function src { . $profile }
+    function rc { vim $profile }
+    ```
+3. Do basic vim settings ...unfortunately I can't edit the `vimrc` settings in `$VIM` (in program files), and this makes me very frustrated.
 
 # 6/27/2023
 
@@ -2191,19 +2191,22 @@ __Foundry-related:__
     - __GTGIS tables__: Kiana has compiled from Gordon a list of tables that our current risk process uses. But the way risk model process address get this data is through querying the snapshot stored on TIMP Oracle DB. Need to work out how to cross-check the tables in there vs. in Foundry
       - Figure out Snapshot process, contact Brian P. (what's last name?)
     - __H Forms__: Check out the datasets in Foundry, make sure they are validated and QC'd.
-    - __Deadline:__ 2/16/2024
+    - __Deadline:__ ~~2/16/2024~~
+      - Change to 3/21/2024 -- prioritize on finalizing performance measurement for steering committee meeting.
 - Start work on building corrosion volumetric loss results in Foundry from ILI data.
-  - Talk to Satvinder about using the same spatial overlay?
+  - Talk to Satvinder about using the same spatial overlay: Move meeting with Satvinder to April.
   - Onboard Kiana here too
-  - __Deadline:__ ~2/16/2024~, 2/23/2024
+  - __Deadline:__ ~2/16/2024~, ~~2/23/2024~~
+    - Move to April tentatively -- depends on steering committee work.
 - Figure out prioritization for automating modeling processes in Foundry -- which ones to prioritize?
   - ~~Meeting with GDM/Alec~~
   - Give GDM/Alec a list of dataasets I need them to ingest, along with the descriptions.
-  - __Deadline:__ 2/23/2024
+  - __Deadline:__ ~~2/23/2024~~
+    - TBD for now
 
 __Modeling-related:__
 - Finish compiling EC model-performance results for steering committee: go through a few more years' data, high priority
-  - Deadline: 2/9/2024
+  - Deadline: 2/9/2024 (Done)
 
 __Direction:__
 - Make slides about probabilistic modeling course learnings:
@@ -2285,6 +2288,51 @@ Notes about weird things that can happen:
       - Each anomaly entry in ILI happens within one of these continuous segments.
       - EC Risk table uses stationing to identify segments of pipes, these can be of finer resolution compared to the continuously inspected segments.
       - So when the distance calculated from the stationing variables assigned to each anomaly is LESS than that calculated from the ILI MP1/MP2 values, that means there are significant chunks of inspected pipes where there are no anomaly found.
+
+
+# Week of 2/10-2/26/2024
+
+Compilation of notes and todos.
+
+## Model performance
+
+Major comments received:
+
+- Instead of using LOF values, look at the scaling and adjustment factor from the EC formulas, which may be more informative. LOF values were obtained through math "trick" to get probability values but not very informative.
+- Stratify analysis by routes, so that different factors can be taken into account. More finely grained insight about model performance.
+  - Types of pipes
+  - Age and install date
+- For Rupture, keep using Pf*/MAOP
+- For leaks, maybe use max depth (%) as the ground truth metric
+
+## On measuring pipe health
+
+Ian brings up the point that `Pf/% SMYS` is a better proxy of pipeline health, while `Pf/MAOP` is a better proxy of relative pipeline risk.
+
+## On anomaly before/after mitigtation
+
+Risk model outputs were calculated from each year's data, including mitigation data. Therefore the performance correlation might be an underestimate. To be more unbiased, either:
+1. Form augmented ILI data taking into account each year's mitigation procedures from the H-forms -- Satvinder's working on something like this and have initiated a process with the Foundry team. But this is still not ideal since we need to sync the data with the risk process to make sure measurements are performed on the same data.
+2. Compare this year's ILI data against last year's model outputs.
+
+## Model performance round 2:
+
+Data available for:
+- Risk model: 2021, 2022
+- ILI data: 2021, 2022, 2023
+
+We can measure Model 2021's results with 2022 ILI data, and Model 2022's results with 2023 ILI data.
+
+Procedures to do spatial join -- just repeat the procedures as before but use the next year's ILI data.
+
+# Week of 3/4/2024
+
+## V2 model performance measurement
+
+Finished, see result [slides](https://pge-my.sharepoint.com/:p:/p/a1yu/Eb31FsKu5lxIsEWaxWlI2d8BrBLYpbmedhluy6lfNsissg), and [notebook](https://github.com/allenyin-pge/ModelPerformance/blob/master/EC_model_performance_v2.ipynb).
+
+Model results don't seem THAT bad -- Rupture scores correlation look worse than leak scores correlation.
+
 
 
 
