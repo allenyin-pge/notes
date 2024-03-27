@@ -2333,6 +2333,141 @@ Finished, see result [slides](https://pge-my.sharepoint.com/:p:/p/a1yu/Eb31FsKu5
 
 Model results don't seem THAT bad -- Rupture scores correlation look worse than leak scores correlation.
 
+# Week of 3/11/2024
+
+## Additional V2 model performance measurement
+
+Brian brought up the point about the current approach's potential bias toward more healthy pipe segments because not all pipe segments covered by ILI have EC-related anomalies. If we only compare the risk model outputs vs. ILI-based metrics for segments with EC-related anomalies, the measurement results can bias toward more unhealthy segments.
+
+To mitigate this, we do the following interpolation procedures to assign failure pressure or %-depth
+values to dynamic segments without ILI anomaly entries:
+- For each route available in the ILI data, find the minimum and maximum
+  (beginstationseriesid, beginstationnum, endstationnum) range. Note that each segment can be
+  uniquely identified by these combinations.
+- Out of these segments, find how many segments does not have any ILI anomalies found.
+- Assign "safe" values to these segments without any found ILI anomaly:
+    - For negative-perc-depth lost, use top 95% value from the max-aggregation results. For this
+        we assume "-Depth (%)" was aggregated after calculation rather than vice versa.
+    - For Pf/MAOP and other failure pressure fields, use top 95% value from max-aggregation results.
+
+Ideally, if the model performs well, then all the "healthy" segments should cluster toward the top-left of the plot (low risk value/x-axis, high health metric/y-axis).
+
+See update result [slides](https://pge-my.sharepoint.com/:p:/p/a1yu/Eb31FsKu5lxIsEWaxWlI2d8BrBLYpbmedhluy6lfNsissg), and [notebook](https://github.com/allenyin-pge/ModelPerformance/blob/master/EC_model_performance_v2.ipynb).
+
+Specifically, check the section on "interpolated" model performance measurements.
+
+Some key take-aways:
+1. Leak results didn't change too much taking into account of interpolation, got slightly better. This would point toward a lack of model sensitivty though, as a well-performaing model should result in cluster of "healthy" segment points and making the rank correlation coefficient more negative toward -1.
+2. Rupture performance result increase after taking into account of interpolation. This is good on paper, but it also showed stripes of healthy pipe segments that have a wide-range of assigned risk values, indicating the risk model (or maybe ILI results?) as not very sensitive.
+
+![rupture results](./assets/EC_rupture_interp_vs_no_interp.png)
+
+# Week of 3/18/2024
+
+## MOR meeting
+
+### Corrosion Growth Analysis (CGA)
+
+Different types include:
+- Signal-to-Signal: Applies on Rosen's autoscan, the most accurate method.
+  - Compare ILI magnetic signal changes between different scans from the same vendors.
+- Mixed-Signal: This is signal-to-signal analysis in the situation where the ILI reports come from different vendors.
+- Box-matching: Compare delivered pipe tally differences. This is the most naive method when there's no access to raw signals.
+
+Signal analysis likely includes some under-the-hood anomaly matching algorithm (likely template matching), before using the mils-per-year formulate to calculate the corrosion growth rate.
+
+It's recommended to NOT BOX-MATCH for corrosion growth rate calculation.
+- Note this is related to Ian's recommendation to use Pf/100% SMYS changes, but it looks like this style of box-matching calculation is not the best.
+
+### ILI repairs (or how to use H-forms)
+
+This relates to the project Satvinder's working on, to integrate repair information from H-forms to update previous ILI data (i.e. this anomaly has been fixed).
+
+- H-forms are uploaded within **2 months** of a dig.
+  - Uploaded to TCAT
+  - TCAT export has "most" of the dig data that allows for matching with anomalies.
+    - Things that are NOT included in the export include things like images/pictures taken.
+- MarinerDB's stationed H-Forms come from GPS coordinates.
+  - Not very accurate.
+  - Motivation to match anomaly with H-form's log distance.
+
+O-Forms + Unity-plot
+- Some digs provide data that would lead to ILI tolerance adjustments.
+  - For example, ILI says anomaly has depth of 5 in, but dig shows the anomaly has depth of only 2 in. If the tolerance is only 1 in, then this anomaly will have violated the tolerance thershold.
+  - If 4 out of 5 anomalies dug violate the tolerance threshold, then the entire ILI run's tolerance will have to be adjusted.
+- These adjustments are currently not tracked in ILI tallys -- need to do this.
+
+### Performance measurement talk
+
+Made long-form slides to explain model performance measurement methodolgy for the MOR meeting.
+
+[Slides](https://pge-my.sharepoint.com/:p:/p/a1yu/Ef48YNtK9pZDqwlZlXQWSKsBo06qhHtu6piuvTQoNB4-8A?e=m4fTBF)
+
+Comments:
+- Do a single plot of all the overall results.
+- Make plot of annual rank correlation coefficients. <-- Decide not to do because only 3 points..
+- Talk about sensitivity analysis and suggest pruning of variables.
+- Discussed a lot more about the model insensitivity (especially rupture).
+
+Gordon has the following specific comments later:
+
+> Some thoughts from our conversation at the MOR over the issue of regression and variables:
+In general engineers don’t have the awareness of nonlinearity and correlated variables, and the fact that regression cannot sort this out without prior data curation (i.e. performing a cos(x) or any f(x) transform, such applying a threshold cutoff on a variable before feeding it to the regression). Spatial autocorrelation is another blind spot. For example, I’ve seen regression studies where the buffered the spatial elements by 5 different buffer distances and used each buffer as a separate variable in pipeline studies (I did this type of regression in graduate school also). Engineers tend to have a simplistic view that regression will find out the influence of each variable directly, which is not the case. It requires controlled experiments where all other variables are held constant in order to find out each variable’s influence, but we aren’t able to do such controlled experiments.
+
+> I like the ranking approach because it doesn’t require linearity, but it can have hiccups where we have a threshold situation, or a bifold type variable influence. Maybe there is a modified ranking approach where a tolerance is applied? (i.e. grouping nearby values and treat them as the same value).
+
+Yes, I think this would be useful to do. I think this is related to what I was referring to as "risk model's pipe segmentation may be too fine", and perhaps some other aggregation method needs to be used.
+
+I'm not immediately sure what kind of factors can be used for grouping though. And we'll need to balance this with preserving the simplicity of the model performance measurement.
+
+> As I said we have the index model that pile on many variables and don’t apply any thresholds to them. The probabilistic approach is: (exposure to threat) x (1 – resistance) x (1 – mitigation). Our model follows this approach with limited mitigation variables but not for exposure and resistance. For example, coating and CP are not applied in the model as mitigation but as exposure factors (and there is no resistance factor separated out). Also as I mentioned, failure history factors are lagging indicators which should be used to calibrate the model rather than as additional exposure factors.
+
+Ah yes – indeed even with regression analysis it's important to take into account of spatial and temporal autocorrelation. Especially with the spatial relationship of the pipelines being irregular, likely the spatial structure needs to be modeled as some type of graph...I've never actually done that..
+
+> Ideally I’d like to see if we can identify some of these issues with the ILI data. One idea I have is to segregate the study also by age of pipe (before 1970, 1970-1990, 1990-2010, after 2010). This might reveal some time based changes (i.e. change of pipeline safety regulations which trigger different pipe material/construction/operational standards).
+
+Oh yes, this was on my todo list. When I consulted with Brian, he suggested dividing by route types, which supposedly correlate with install date?
+
+Anyways, I think right now there are three major directions for improvements:
+1. Data infra requirement for quicker turn-around for both model performance and model improvements.
+2. Formulate more realistic model performance measurement methods without it becoming more complicated (i.e. requiring additional validation). Probably some more literature search is needed to inform this?
+3. Model improvements guided by performance measurement
+    - Approach 1: Modify current model – factor sensitivity analysis, mitigation vs. exposure modifications, etc
+    - Approach 2: Move toward different approach – regression, random forest, simulation based probabilistic models (I'm not too partial on those after going through the probabilistic risk model course...really dependent on having an accurate system model)
+
+
+# Week of 3/25/2024
+
+## Leakmaster Foundry notes
+
+Leak Master Phase 2 Plan - Potentially led by GFP/Product Ontology Team*
+- Source Leak Repair data directly from SAP BW
+  - Requires and engage with SAP expert assistance, i.e. Samayamanthula, Aravind or someone from appropriate SAP leak related business or technical team
+    - Need to research and/or import into SAP BW the SAP Leak Repair data that is sourced from SAP Operation system as per the [FD CR 108149642 Leak Data Report Program for TIMP Annual Risk Analysis_V1.2.docx](https://pge.sharepoint.com/:w:/r/sites/ODGTeam/Shared%20Documents/Conceptual%20Model/Gas%20Ontology%20Federated%20Team/Gas%20TIMP%20Leak%20Master%20Public%20Ontology/FD%20CR%20108149642%20Leak%20Data%20Report%20Program%20for%20TIMP%20Annual%20Risk%20Analysis_V1.2.docx?d=we82f919b4155409aa1bf6bcc8c4110ed&csf=1&web=1&e=r1Anew) requirements document
+    - Once SAP Leak Repair data is in SAP BW, ingest these data into OIT Foundry Raw and Clean layer
+    - Once SAP Leak Repair data is in OIT Foundry, apply Steven Liu's logic to prepare it for Miguel's Leak Master process
+    - Ingest W22 and Gas Corrective SAP generation datasets into OIT Foundry Raw and Clean layer
+      - Use these datasets and the SAW BW sourced SAP Leak Repair dataset to feed Leak Master Base Ontology layer dataset
+
+Notes about ingestion for this plan:
+- Note that the requirement doc outlines the tables needed for compiling the leakmaster dataset from the production SAP database.
+- The SAP BW database lies downstream from the SAP production database.
+- Foundry can only read from the SAP BW database, per security policies.
+- It's not clear how SAP PROD tables are mapped to SAP BW database tables.
+- Aravind has apparently taken the relevant TIMP and DIMP datasets from SAP BW and ingested into Foundry.
+  - TODO: But it's not clear how he determined which SAP-BW tables are relevant. Need to figure this out in next week's meeting.
+  - TODO: We also need to determine the mapping between SAP-Prod and SAP-BW such that the TIMP-leak relevant data can be selected from the SAP-BW data ingested into Foundry.
+
+
+## Steering committee meeting
+
+[Steering committee meeting model performance slides](https://pge-my.sharepoint.com/:p:/p/a1yu/EVP4UqC-8E1KpicureFoWOQBdfc-fPhoLtZxVFEraRLeRw?e=LkaJuh)
+
+
+
+
+
+
 
 
 
