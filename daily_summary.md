@@ -2464,6 +2464,112 @@ Notes about ingestion for this plan:
 [Steering committee meeting model performance slides](https://pge-my.sharepoint.com/:p:/p/a1yu/EVP4UqC-8E1KpicureFoWOQBdfc-fPhoLtZxVFEraRLeRw?e=LkaJuh)
 
 
+Feedbacks:
+- Might not expect correlation between rupture and Pf*/MAOP, in fact the assumption that anything we measure is predictive of rupture might not be correct, according to corrosion guy (Jason Kletchka).
+  - Maybe leak is leading indicator of rupture?
+  - No confidence on SME methodolgy about how corrosion leads to rupture.
+- For SSWC, lack of positive cases makes statistical measurement difficult. How to get around?
+  - Compile industry data?
+- What we want from SMEs:
+  - Make sure we are measuring the right thing for model performance, e.g. if not Pf/MAOP for rupture, what else?
+  - Do factor sensitivity analysis to throw away uninformative factors.
+
+Ian's comments:
+- Open with analogy: "trying to maintain a certain speed without looking at the speedometer.  How to you know to step on the gas or take your foot off the pedal.
+Making changes from a 1st principles perspective - you can only go so far without measuring performance"
+- End with ask: "Think about what data we can use as our ground truth to help us calibrate risk models"
+- Tighten up the delivery:
+  - Skip the linear vs. nonlinear slide and say "this metric should work in all these conditions so we don't need to worry about model specifics"
+  - Skip the ILI methodolgy slide.
+
+
+# Week of 4/1/2024
+
+## TODO:
+
+1. ~~Take care of all the permission things with Foundry~~
+2. ~~Update the SC slides~~
+
+## After steering committee meetings:
+
+1. Start putting corrosion metric into Foundry after steering committee meeting
+    - Do infra work in Foundry, and have Kiana interface with Satvinder
+2. Apply perf metric to more threats
+    - Talk to Jackson about dividing this work on this.
+    - Update 5/1: This takes a back-seat to data integration
+3. Think about model improvements -- building blackbox model as Gordon suggested for EC?
+
+Data ingestion:
+- Important for SMEs to understand the dataset!!!! Example with Richard, SCC and pipe temperature
+
+Thinking about Foundry ingestion scaling problem:
+- What datasets we want to push? Who can assist with reviews
+- Identify data owners.
+- Train everyone in using Foundry
+
+# April, 2024: Steering committee meeting notes compilation
+
+## ILI data
+- ILI data can be inaccurate at classifying internal corrosion vs. not IC vs. manufacturing anomaly
+- If ILI call-out disagrees with actual digs, what should we do?
+    - Invalidate entire ILI run? A single bundle or segment?
+    - Need better info on ILI measurement characteristics...how to validate ILI?
+    - Need to tie dig-data back with ILI data -- Satvinder + Kyle Collett are going to work on this, I think.
+
+## Leak vs. Rupture
+
+Failure mode of a pipe segment is assigned leak or rupture based on Pf*/MAOP and its comparison with 1.
+
+So if there are points in the model performance plots with Pf*/MAOP > 1, then this means for example:
+- Year 2020 risk model thinks a segment has Pf*/MAOP < 1, and assigns a rupture score
+- Year 2021 ILI shows Pf*/MAOP of that segment as greater than 1.
+- So this means the model's degradation criteria is too conservative!
+
+For model improvements, it's probably better to fix and incorporate mitigations and examinations at the data level, instead of in the model level, to make workflows simpler and models less complicated.
+
+## Feedback on model performance measurements from SC:
+
+- Definition between leak and rupture might need some rework -- currently defined by value of Pf*/MAOP.
+- Someone suggested "blunt metal loss" might be more indicative of rupture?
+- Perhaps we should segment data by anomaly types and classification (i.e. slotting vs. grooving)...not sure how this helps exactly though.
+
+
+# Week of 5/1
+
+## Notes from Leakmaster Phase II
+
+There are parts in the leak master dataset that requires manual addition by Miguel. This would make this dataset a "Data product", rather than a "public dataset". Specifically, no edits can be made in public datasets. Archana makes the following suggestions:
+   - Once leakmaster the "public dataset" has been delivered, for Phase III, we will need to talk to product dataset people.
+   - They can then convert the dataset into a "Data product", that can receive manual alterations.
+   - But this might also require each team to have a data engineer to go through training, etc to do it
+
+## Notes for incorporating 2SD corrosion detection tool into Foundry
+
+Talked with Satvinder on connecting corrosion ILI std with spatial visualization
+    - In order to show segments, need survey distance information, ideally, over MP
+    - Satvinder's dashboard use lat/long to plot points
+
+## Notes on threat identification data audit:
+
+[Slides](https://pge.sharepoint.com/:p:/r/sites/TIMPRisk/Shared%20Documents/CE%20Team/Machine%20learning/Foundry/threat_identification_data_ingestion/data_source_audit_flow.pptx?d=wec2d2486f51840ef984f8a17ab840f42&csf=1&web=1&e=HI8z24) used to illustrate the process.
+
+- Identify process with Steven/Jackson/threat chairs
+- Might see resistance from teams that doesn't have good data maintenance practice
+  - Identify datasets that are cleaner and requires little cleaning
+  - There are tedious datasets that might see different data problems every year
+- "Threat chairs still need to look at the dataset", but reduce their workload and time spent on it.
+- GTGIS should be the reference for mile-point and route-names
+  - Route-name changes should be flagged and can notify us
+- Additional benefits: do historical comparisons
+- There are some datasets whose cleaning process (outlined in RMI documents) require GIS operations -- it's unclear what the GIS capabilities are in Foundry. So I should document whether this is needed during the data audit process.
+
+
+## TODO:
+
+1. Start the thread ID data audit process
+2. Start integration corrosion 2SD flow into Foundry
+3. Run risk model perf measurement with Gordon's updated segment layer
+4. Maybe talk to SME about better pipe health proxy, and apply to other threats??
 
 
 
