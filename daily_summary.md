@@ -2567,9 +2567,98 @@ Talked with Satvinder on connecting corrosion ILI std with spatial visualization
 ## TODO:
 
 1. Start the thread ID data audit process
+    - Figure out a good process for doing this, and delegate work.
+    - Make a chart of the things I need to keep track of
+    - Get the sources
+    - Start collection
 2. Start integration corrosion 2SD flow into Foundry
 3. Run risk model perf measurement with Gordon's updated segment layer
 4. Maybe talk to SME about better pipe health proxy, and apply to other threats??
+
+
+# Foundry learning notes
+
+## Think of Data Pipeline stages as projects:
+
+- Data source projects: used to ingest data from connections and raw data sources
+- Transform projects: Transform data source project outputs into views that feed into ontology layer
+- Ontology projects: Actual datasets representing some operational concepts
+- Workflow projects: Specific data products based on the ontology objects
+
+It's much easier to think about these projects/concepts as different parts in a data lineage directed graph (DAG):
+    - Data source projects: nodes without parents
+    - Ontology projects: final nodes that are "published" publicly in an organization
+    - Transform projects: All nodes in-between
+    - Workflow projects: Custom nodes that descend from ontology objects.
+
+## Data-driven mindset
+
+In Foundry, data and data pipelines are "first-class" citizens -- everything is oriented to creating and manipulating data.
+
+Different tools and when to use them when building a Data Pipeline:
+- Prototyping: Contour, Code Workbook to prototype data transformations between moving them into a production pipeline These applications should be used for prototyping and analysis only and not to output datasets as part of a production pipeline.
+- Transformations:
+    - __Pipeline Builder__ is the default, preferred application for transforming data as part of a production pipeline.
+    - __Code Repositories__ are also sufficiently flexible and robust to output datasets as part of a production pipeline, but they should be used as a complement to Pipeline Builder when specialized transformation code is needed.
+
+
+# Week of 6/10
+
+## Corrosion stats Foundry flow
+
+Corrosion stats foundry flow is now done. The project folder is [here](https://damask.palantirfoundry.com/workspace/compass/view/ri.compass.main.folder.6de888fd-e90a-4514-8be1-21811c189f82).
+
+It consists of:
+- Data source project: Made from Pipeline Builder, to clean the [augmented ILI tally dataset](https://damask.palantirfoundry.com/workspace/data-integration/dataset/preview/ri.foundry.main.dataset.6178f8de-4495-4699-98a0-6aab0b740c86/master) to only rows relevant to external corrosion.
+- Data transform project: Made from code repo, to calculate normalized, and absolute volumetric loss for pipe segments, and mark them according to 2SD above mean threshold.
+
+This has been passed to Satvinder for integration and spatial visualization in PowerBI.
+
+### TODO:
+
+Set up and make sure build schedules properly, to update whenever ILI tally is updated.
+
+## Foundry ingestion
+
+Leak master dataset is closed to be finished. Some parts that differ significantly from the previous process with ILI:
+- Threat identification: This is done by Miguel previously manually, he has since written them as VBA logic to be validated within excel. This will be formalized in the Leakmaster flow.
+- Getting latitude and longitude and assigning location for leaks (spatial processing):
+  - Leakmaster dataset source "leak repair" data from SAP BW, and also other data from SAP. Latitude and longitude information is usually available from the repair info.
+  - From lat/long, route and MP are usually deduced by Miguel by overlaying them on ArcGIS, if `route` and `MP` fields were not available.
+    - If there were disagreements, Miguel resolves them with some logic. Usually default to leak repair data.
+  - This is now being automated from within Foundry: doing spatial joining and inferring the actual locations' route and MP fields.
+
+Great stuff! Previously, we though the threat identification might call for Leakmaster Phase 3 work where a write-back is needed to infer threat type from Miguel's manual process. But since this is now automated, Leakmaster should be done at the end of Phase 2.
+
+## Problem from OIT office regarding Foundry
+
+Turns out after Leakmaster dataset is matured, we may no longer have OIT support for ingesting datasets to Foundry. Archana Kumari informed us, and she has been moved to a different team.
+
+Later conversation with Alec McCullick informed me that:
+- OIT is planning on big overhaul to SAP, called "Project Propel" to use SAP Propell, some kind of database upgrade.
+- As a result, there's a stop order for many OIT-related tasks, including Foundry data work on the gas side.
+  - Related, Foundry datasets and ontology will be on life support.
+- There are still some IT decisions to be made. Their eventual goal is to serve data in many different analytics platform eventually from (Snowflake/Foundry/SAP Propel, not sure)
+- Alec is trying to make the case for continuing work in TIMP Risk
+  - Possibly moving the headcount to "business" (i.e. Gas department vs. OIT).
+
+
+## TODO:
+
+1. Start the thread ID data audit process
+    - Figure out a good process for doing this, and delegate work.
+    - Make a chart of the things I need to keep track of
+    - Get the sources
+    - Start collection
+2. ~~Start integration corrosion 2SD flow into Foundry~~
+3. Run risk model perf measurement with Gordon's updated segment layer
+4. Maybe talk to SME about better pipe health proxy, and apply to other threats??
+
+
+
+
+
+
 
 
 
