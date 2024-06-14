@@ -2654,6 +2654,39 @@ Later conversation with Alec McCullick informed me that:
 3. Run risk model perf measurement with Gordon's updated segment layer
 4. Maybe talk to SME about better pipe health proxy, and apply to other threats??
 
+# 6/14/2024
+
+## Data Audit example
+
+Target=External Corrosion
+
+
+![EC_ThreatID](./assets/EC_ThreatID.png)
+
+This one is easy since there's only a single box, regarding whether the pipeline is plastic or not.
+
+Looking into [ThreatV15 Report](<https://pge.sharepoint.com/:x:/r/sites/TIMPRisk/Shared Documents/CE Team/Machine learning/Foundry/threat_identification_data_ingestion/Threat v15 Report.xlsx?d=w77446ffb7963447aa10a566d9aaa301a&csf=1&web=1&e=63AJqN>)'s Model Tab to find the following:
+
+![EC_ThreatV15](./assets/threatID_spreadsheet_EC.png)
+
+We see that Box 1 requires the variable `EC_Pipe_Material`. Then we can find this variable in the Data tab of the same spreadsheet:
+
+![EC_ThreatV15_DataTab](./assets/EC_ThreatV15_DataTab.png), which tells us this variable corresponds to the a MarinerDB field named 'Pipe_Material`.
+
+Now we cross check the [TIMP Risk Data Source doc](<https://pge.sharepoint.com/:x:/r/sites/TIMPRisk/Shared Documents/CE Team/Machine learning/Foundry/threat_identification_data_ingestion/TIMP_Risk_Data_Sources_Doc_12102021.xlsx?d=wd6e0606b073148d2b839970ef3c89d91&csf=1&web=1&e=7iiepo>) for the `Pipe_Material` field, which shows:
+
+![Pipe_Material_Data_Source](./assets/TIMP_RiskDataSourceSheet_PipeMaterial.png)
+
+Looks like the location of thet data just prior to ingesting into the Mariner Table is `\\gisapp01\gasgis06\SI\SME_Tables_RiskAnalysis\QRAD_2021\DataQuality\SN_21.gdb`. However this is the location of a curated ArcGIS database. The location of the actual data is in `GT-GIS`, and the source contact is "Brian Bedord".
+
+So, the next step will be to talk to whoever compiled the pipe material data from GT-GIS into the `SN_21.gdb` and obtain all the data transformation steps taken, in order to prep for its ingestion into Foundry.
+
+
+
+
+
+
+
 
 
 
