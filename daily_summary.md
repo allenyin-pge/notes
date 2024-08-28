@@ -2681,11 +2681,329 @@ Looks like the location of thet data just prior to ingesting into the Mariner Ta
 
 So, the next step will be to talk to whoever compiled the pipe material data from GT-GIS into the `SN_21.gdb` and obtain all the data transformation steps taken, in order to prep for its ingestion into Foundry.
 
+# Week of 8/26/2024
+
+Lots of notes to dump before I leave for a month. Haven't kept up to date.
+
+A big pivot happened regarding the projects I'll be working on for the rest of the year:
+
+1. Foundry-based data ingestion -- this has been too ambitious of a goal since there is just sooo many datasets and teams involved. And without help of OIT, there's not enough resources to handle this.
+2. Instead, we identified a need for the GTGIS PODS data (pipeline specs, centerlines, etc) to be temporally consistent. PODS data stored in the GTGIS database is the data source that feeds into the most downstream TIMP processed. However, stationing mismatch issues from year-to-year result in length snapshot and data correction processed for TIMP data integration phase every year.
+
+A second project I'll be working on is to productionize previous work by Even and his collaboration with Duke MIDS (capstone project) on Random-forest based TPD risk model.
+
+## About the rationale to focus on PODS data
+
+The pivot was motivated by discussion with Gordon, regarding the value of ingesting different datasets, and their potential benefits for the TIMP Risk process:
+
+> All PODS data about pipeline assets are affected by stationing issues. The only data independent of it and hosted in GTGIS is the structure data managed by the HCA/MCA team. It changes every year but most people are interested in the latest version. 
+
+> I think automating CP data and SCADA data have the most value. Gas Planning data will be difficult to automate because they manually set and run gas flow models for different conditions on the synergi software.
+ 
+> CP and SCADA both will need data cleaning in terms where where the measurement points are on the pipeline system, and what they're measuring. They're both high volume data that is difficult to analyze using normal tools.
+
+So here we have potential project opportunities:
+1. All PODS data are affected by stationing issues
+2. CP and SCADA data cleaning process can be automated to derived short-term values.
+
+Trying to understand more about the stationing mismatch issue and its impact, summarizing conversation with Gordon about the cause, severity, and impact of the problem.
+
+### Stationing mismatch problem
+
+Stationing = reference points placed along a pipeline to describe its location.
+
+__Cause__
+
+The issue is that the stationing change over time, making it inaccurate to try to compare older data derived from PODS with current PODS data. 
+
+__Severity and Impact__
+
+In TIMP Risk's annual GTGIS snapshot process, a representation of the current year's pipelines is built, and each snapshot is internally consistent but any new updates will have shifted stationing -- this necessitates new snapshotting process every year.
+
+When we try to compare different year's risk results and PODS data, spatial matching to try to make it comparable, but the matching method always will have some errors.
+
+For example, to look at how risk scores change for a segment of a pipeline, it requires mapping the dynamics segements of each year's risk outputs, then do spatial join to get the scores corresponding to different year for that spatial segment.
+- But a few other logics are needed to improve accuracy. For example, if a pipeline centerline was moved due to better coordinates found, spatial join won't be good enough -- the actual characteristics (e.g. stationing, PFL, etc) need to be used to match the actual segments.
+- In general, since ArcGIS cannot reverse engineer stationing changes due corrections, etc, a pure spatial approach does not work.
+
+__What if we had a solution?__
+ 
+> If someone can develop an algorithm to reverse engineer it it would be great. They would need to compare the PFL feature number, pipe specification, data update dates, etc.
+
+What data is available for us to track PODS changes?
+
+> These are logged in mapping work orders. the attribute data are updated by the PFL services teams, the centerline and stationing are updated by GT Mapping. Both under Traci Krueger the manager of mapping. The GT data analysis team under Brian Bedord with RL in the team are there to troubleshoot issues, make global corrections / updates, provide data pulls, etc.
+ 
+> There is a PODS history schema in GTGIS also that stores adds and deletes. Several years ago I tried to use it to monitor changes in the data and do some stationing matching. Not sure if anyone continued to use this, probably no.
+ 
+> suppose we can track changes in the PODS tables such that snapshots can be compared across years, what does that give us?
+
+It would make comparing risk results across the years easier
+
+Compared to our current more manual spatial matching process, we can potentially automatically correlate older snapshot data with new data, compare if the pipe spec has changed, and if the risk input data has changed. These will lead to quicker analysis and update of results.
+
+The new hypothetical process can potentially be much less error prone, since
+ 
+ > Manual spatial process has errors. It either matches a portion of an older version route to the entire route in the new version etc., could not match, etc. For most backbone and longer routes the matching is good, the errors tend to be near stations or short routes. But even if spatial matching is correct the pipe features are not necessarily matched correctly. stationing changes will cause some pipe features to move up or down stream. We can't take care of this unless we know there was no stationing change but only coordinate change.
+ 
+On potential time-saving with this tool:
+> If we match perfectly then each time engineers analyze a pipe segment they don't need to spend time figuring out the stationing, or ask the data team to match it. Would saves, say __30-50% of time of each task__.
+
+Other useful information: 
+- Engineers use PFL feature number the most, it's closest to a unique ID. However mapping does not maintain it as a unique ID
+- Mapping doesn't maintain unique ID though, because to maintain a unique ID we will need to review all the changes each year to make manual matching
+  - We will need to resolve changes to PFL feature numbers; when a pipe feature is split into two we need to be able to handle the ID lineage.
+  - So manual data review is needed to keep a downstream unique ID, same with upstream.
+
+__In summary, stationing mismatch is a big source of errors, manual data correction, and potential errors for the TIMP process. Solving this problem can lead to 30-50% time saved per data validation task, which in total can save ~1 month every year for 3-5 engineers, potentially.__
 
 
+ ## Fact-finding meeting with GTMapping team on 8/12/2024
+
+ Meeting was with:
+ - GTMapping/PFL team (Traci=manager): Hinde (GT Mapping), Andrea Debrow
+ - GTGIS Solutions: Peter Gleason (who has since left)
+ - GIS Solutions: Jacob Gillen
+ - GTGIS: Dante Lorenzetti
+
+ A bit fuzzy with all the team affiliations, but they all work under AKM.
+
+ Questions that we covered included:
+ 1. How does Mapping work?
+ 2. How are changes to the PODS data ingested and integrated?
+ 3. How to track the database changes for historical comparisons? What blockers are there?
+
+__Reasons stationing can change from year to year__:
+- Replacement and re-route processed can happen. Sometimes jobs are processed lagging the actual
+  field changes.
+- Job processing can be out of order due to queueing of data before jobs data actually get to mapping
+- Lengths that were estimated that are far off, so doing additional corrections due to newer information available.
+
+__How does stationing changes? (Jacob)__
+- Build in logic to preserve and adjust stationing depending on actions:
+  - Addition/subtraction of pipe length is easy
+  - Edgecases that Gordon sometimes find out, e.g. not a geometry change but spatially shifting around the pipes
+    - "altered map tool" of mapping team can lead to discrepanices, maybe create some notifications
+
+__Biggest challenge to get the temporal changes consistent:__
+- Getting all the historical data query and transactions together. Schema of transactions and PODS data are the most difficult
+- PODS data transactions require querying 6 tables -- data corresponding to the same transaction are in 6 different tables, not necessarily easily linked together even though written by a single process.
+- Update transactiosn in the update has no direct link to the actual job...can infer from jobs processing range
+
+*Note these challenges all seem solvable*
+
+__Any other way to align things?__
+- EventIDs stay the same year-to-year unless feature itself has been replaced. The only way to see changes in the same feature
+  - Every row in "facility detail" gets EventID -- represents
+  - Before applying changes, a copy is created, and EventID will change
+  - Can compare EventIDs on the active line across itself.
+  - EventID processing: If a pipe is cut and split, replace with all new eventIDs. Works for "active line" vs. archived versions
+
+Follow up with Andrea Disbrow, and Peter Gleason about using eventID
+
+## Fact-finding meeting with Brian Bedord and team, 8/26/2024
+
+People: Brian Bedord, RL Mulder, Dante Lorenzetti, Steven Verbrugge, Qohar Damanhuri
+
+Everyone acknowledged the validity and complexity of this issue, and we discussed potential solutions to approach this problem.
+
+__Option I: Use engineering stationing__
+
+- Absolute stationing: Any additional work e.g. added pipes, will result in changes for everything downstream of the location of the change.
+- Engineering stationing:
+  - Except for new work, engineering stationing stays consistent YoY, meaning only the replaced pipe sections will have stationing changes while everything around that section stays the same.
+  - Jobs = "subsections that have been replaced"
+- What about if pipes were added in the middle of a route, how to track that, even with engineering stationing?
+  - This will require mile-point marker matching.
+
+__Option II: Use EventID__
+
+- "Events" are row records in a table representing a change of somet theme
+- (Dante): EventID is good for comparing specific components, e.g. how a valve changes year over year.
+  - New pipe installation would result in new EventIDs, compared to last year's snapshot
+- Potential problem: EventIDs can be "shortened" (??)... not too sure what this means exactly..
+
+__Option III: Spatial join for everything?__
+
+- Idea: Get spatial location from EventIDS and join with the "master database"
+  - Spatial specs of pipelines can change due to improved GPS measurement
+  - How to propagate these changes toward the past?
+- As Gordon mentioned, pure spatial approach can have inaccuracies due to inaccuracies and coordinate changes, so we must also match pipe characteristics.
+
+__Option IV: Hybrid solution__
+
+Thought exercise:
+- Start with a spatial database: spatial points for sections of pipes and their attributes (e.g. PFL, MAOP, coating, etc)
+- With new EventIDs for a given year:
+  - If it's an attribute change, change the attributes for those points.
+  - If it's a measurement change (different GPS coordinates):
+    - Find which points correspond to the measurement change, using a combination of spatial and attribute query.
+    - Change them in the updated database.
+    - Backpropagate them to the same points in previous years' snapshots..how to do this?
+      - Each year generate uniqueID
+      - For every consecutive year, changes can be represented by:
+        - Addition: New uniqueIDs
+        - Changes/updates: Mapping of last year's uniqueIDs to this year's uniqueIDs.
+
+__What we need to do to prototype/think about a solution?__
+
+Define scenarios we need to address:
+1. Pipes are added, resulting in eventID -- can we get an example data for this?
+2. Pipes are deleted, resulting eventID
+3. Section of pipe is modified
+4. Location shifts that were intentionally made to move the features to more accurate locations through mapping work (CAPs, PMs, clea up work) performed within the vicintiy.
+
+Examples of this last class of changes include those recently described by GTGIS Solutions team:
+
+```
+DRIP9871: This route had its begin geometry re-aligned as part of work on CAP128045583; previous begin was 400’ off spatially from where TPLAT/as-builts place it.
+ 
+
+2408-01: This route had its geometry along Stanley re-aligned as part of work on multiple CAP/job assignments on nearby GCUST5896 (including PM31533878). Geometry for 2408-01 was extremely “bunched up” in this area, resulting in the feature in question (a pipe associated with an H-Form) to be ~490’ off spatially from where the H-Form GPS and location info place it.
+ 
+
+7205-01: This route had its geometry around STUB8089 re-aligned as part of cleanup work related to HCAs /floating branches. The STUB and mainline geometry around it were previously off by ~460’ spatially from where drawings place it. There was an additional issue here not previously resolved until today with tap F#108 on the mainline having been moved to a new stationing (an error made during previous DDA work) when in fact the mainline simply needed to have its PIs deleted and re-placed to avoid another “bunched up” situation. The tap has been restored to the correct stationing and PIs re-placed so no issues remain here.
+ 
+
+8807-01: This route had its geometry re-aligned from bend F#306 on downstream through end as part of work on PM31061065; previous geometry had aligned PIs for bends F#307 – 323 to incorrect pipeline_points, resulting in the bends being “bunched up” and not matching drawing locations/as-built measures between them.
+ 
+
+107_P2 (appears as 107_U in spreadsheet): This route had its geometry re-aligned as part of cleanup work ahead of the TIMP snapshot this year; previous geometry had bends in this vicinity mis-aligned.
+ 
+
+103: This route had its geometry re-aligned as part of cleanup work ahead of the TIMP snapshot this year; previous geometry had PIs “bunched up” in this vicinity. There is an additional issue uncovered at this location to be yet resolved through CAP129413491.
+ 
+
+302E: This route had its geometry re-aligned as part of work on PM84003762; previous geometry had bends 1000’+ off spatially.
+```
 
 
+## Third-party damage (TPD) ML modeling
 
+Second ongoing project is to revive TPD-ML modeling.
+
+### __Meeting with Satvinder__
+
+Met with Satvinder to learn more about how the TPD data integration process works.
+
+Unconfirmed "dig-in": ILI call outs, etc that are not digged, or without source confirmed
+Confirmed "dig-in": Leaks from leakmaster whose cause is flagged as TPD can show up as "dig-in" as well
+"Historic leak review": one off effort to go through past historical data
+
+Not clear whether reported leak and Dig-in tracker (Dirt report) data are distinct though!
+
+Pipe segment where repeat contractor has worked on before gets its activity score increased
+
+__TPD data sources__:
+
+Factors that are collected and feed into attachment3 model:
+
+- Activity indicator score calculated from activity indicators (Table 90)
+  - Data come from PGE, where does this come from? Steven Walker from damage prevention
+  - USA ticket = files calling 811
+  - Aerial patrol activity dataset -- how often aerial patrol covers an area
+  - "Digging without 811 observed by patrol" -- this is from the "aerial patrol observation dataset"
+    - Satvinder compiles this "observations_no_usa" dataset.
+    - Observations compiled from image detection, followed up by Ground Patrol (GP) observations
+- Third-party dig-in history score (Table 91) -- from Dig-in tracker.
+  - Higher score for confirmed dig-ins
+  - Lower score for other damage
+- Resistance to deformation factor
+  - Depth of cover: from WAP? Centerline geodatabase...updated by Gordon (more accurate). WHere does the data come from?
+  - Resistance to deformation: Material property
+  - Operating stress: pipe specs
+- Preventative measure factor:
+  - Aerial patrol factor: Patrol happens once a quarter, not a big deal anymore
+  - Line Marker/Warning Tape factor: Centerline data from Gordon
+  - Public awareness factor: data was gathered from the public awareness team
+    - Have a set template with columns of [City, MediaType] -- only those with spatial information gets used
+- First- and Second-party damage:
+  - Activity indicator??
+  - Safe to ignore probably
+- PDAR: Specific repairs data, gets incorporated into the dig-in tracker
+ 
+Should we focus on predicting probability of confirmed dig-ins only?
+
+Summary of data gathering results:
+- Dig-in tracker = PDAR + ILI + TCAT
+- Cover depth = spatial database relying on centerline data
+  - Exposed pipe = indicates sections of pipes that don't have cover (depth=0), from ground observations
+- Pipeline marker = geodatabase
+- Repeat offenders = contractor list
+- ROW Mailers + Media Outreach = public awareness
+- Foreign pipeline = geodatabase for presence of pipeline crossings
+- USA tickets -- from PGE
+ 
+ 
+### __Meeing with Even__
+
+Even has previously worked on TPD ML model, and also have Duke MIDS program work on it too.
+
+In beginning, previous guy Greg developed a model that didnt' perform well.
+
+Even's work:
+- Tuned the old model
+- Did data wrangling for the original data
+- All the data from MarinerDB -- best thing to start from.
+  - Data integration..special join to resectoionalize and add extra features
+   - Done by Jupyter scripts, output to csv
+   - Then process using "preprocessed_tpd.R" --> translated to TPD_RtoPython.ipynb -- also has the model
+	- Back then R was easier to do categorial modeling, etc
+   
+Model details:
+- ILI data is included, but doesn't cover all the pipelines...assume TPD risk distribution is similar to that on ILI pipelines.
+      - Use ILI subset as train/test to validate model.
+- Spatial join of ILI with Mariner dataset..
+  - Even Cut the lines in sections, to make sure partial overlaps is not counted as full overlap
+  - Operation is called "dissolve" ...to get better results
+        - "Dissolve_TPD_all_0623.csv" is from spatial join/dissolve with all the things in ArcGIS (data referenced is here: file://ffshare01-nas/RiskMgmt/S8L5/tpd/)
+    - `mile = "05mile"` means: if at some point +/-0.5 miles TPD damage was identified, then that pipe segment is
+    labeled to have TPD damage.
+- Factors are `gregfun`.
+  - `OD_Adjusted`, `WT_Adjusted`: Numbers are sometimes random looking due to recording-keeping differences over the years (actual reading vs. standardized readings).
+	  - If numbers are in certain range and installation date is something..then cast it to some number with a lookup table
+        - Code is in "Auo_Table_Matching.ipynb"
+  - Thien-Tanh: Ask him what "FinalClass2020" is
+  - "Name" = county name.
+  - "midlat"/"midlong" -- the coord of the mid-point of the segment
+  - "elevation" -- height of the segment
+ 
+Model development data source:
+- Used older ILI data for training, and more continuous segments for testing.
+- Did not use fully-random selection for train/test-split.
+  - Use random seed to determine where to cut a pipeline...cut 20% of a continuous segment as a test set, and use the rest as training set.
+- Labels of the model = Digin-tracker has confirmed TPD damage, ILI provides "unconfirmed" TPD damage
+  - Regression Random Forest = prob model, then pick threshold and check classification results on the ground-truth locations
+  - Use threshold tuning to represent risk tolerance
+
+Model results/presentations:
+- file://ffshare01-nas/RiskMgmt/S8L5/tpd/MIDS%20deliverable/
+- Duke MIDS have good deliverables: file://ffshare01-nas/RiskMgmt/S8L5/tpd/MIDS%20deliverable/
+  - They additonally use external datasets in their models
+
+Thought exercises:
+```
+X = {factors}
+Y = {damage, no damage}
+Y_damage ~ {dig-in tracker, ILI}
+Y_no_damage ~ {..}
+```
+
+Classify everything from ILI that's not Dig-in damage as 0.
+
+Single year note:
+- Example: Pipelines corresponding to previous dig-in tracker may be removed already
+- We don't need to treat Pipe1_segment1 in 2023 as the same as Pipe1_segment1 in 2020 -- can pool data there if can account for double counting of damages found (i.e. 2020 found 5 cases, 2023 found 10 cases, then 2023 should discount the previous cases..)
+  - Standardize the covariates
+
+### __What needs to be done?__
+
+First order of business:
+- Get hold of historical marinerDB data
+- How to combine them with ILI data?
+- How do we still treat the ILI data bias? i.e. only big pipes have ILI data?
+- How to get the per-county construction spending data that Duke MIDS had?\
+- Comparing mariner db data from across years can be difficult due to staioning mismatch -- how to get around that and validate results?
 
 
 
