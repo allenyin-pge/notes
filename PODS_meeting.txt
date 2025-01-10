@@ -1,0 +1,66 @@
+Intro:
+
+- GT Mapping/PFL (Traci = manager): Hinde (GT Mapping), Andrea
+- GTGIS Solutions: Peter
+- GIS Solutions: Jacob
+
+All under AKM team.
+
+------------------
+Main questions:
+
+- How does Mapping works?
+- How are changes ingested and integrated?
+- How to trace back for historical comparison? What are the blockers?
+
+-------------
+
+PODS data integration/storage
+
+Reasons stationing can change from year to year:
+- Replacement and re-route processed can happen. Sometimes jobs are processed lagging the actual
+  field changes.
+- Job processing can be out of order due to queueing of data before jobs data actually get to mapping
+- Lengths that were estimated that are far off, so doing additional corrections due to newer information available.
+
+How does stationing changes? (Jacob)
+- Build in logic to preserve and adjust stationing depending on actions:
+  - Addition/subtraction of pipe length is easy
+  - Edgecases that Gordon sometimes find out, e.g. not a geometry change but spatially shifting around the pipes
+    - "altered map tool" of mapping team can lead to discrepanices, maybe create some notifications
+
+Biggest challenge to get the temporal changes consistent:
+- Getting all the historical data query and transactions together. Schema of transactions and PODS data
+  are the most difficult
+- PODS data transactions require querying 6 tables -- data corresponding to the same transaction are in 6 different tables,
+  not necessarily easily linked together even though written by a single process.
+- Update transactiosn in the update has no direct link to the actual job...can infer from jobs processing range
+
+Any other way to align things?
+- EventIDs stay the same year-to-year unless feature itself has been replaced. The only way to see changes in the same feature
+  - Every row in "facility detail" gets EventID -- represents
+  - Before applying changes, a copy is created, and EventID will change
+  - Can compare EventIDs on the active line across itself.
+  - EventID processing: If a pipe is cut and split, replace with all new eventIDs. Works for "active line" vs. archived versions
+
+Follow up with Andrea Disbrow, and Peter Gleason about using eventID
+
+-------------
+Meeting on 8/26 with Brian Bedord's team
+
+- Stationing: Engineering vs. Absolute
+- Right now Gordon uses a stationing matching script
+  - Originally use seriesid (same as route-id) -- this is absolute stationing 
+  - After migration, scripts didn't migrate seriesid, so end up doing spatial matching:
+    - Take last year's data and spatially projecting to this year's data to get the new stationing values.
+    - This effectively short-circuits all the events..
+- Now:
+  - Two types of IDS: RouteID + SeriesID.
+  - SeriesID maintains engineering station value. With RouteID --> this is absolute stationing, this makes things hard because footage add will change all downstream pipes.
+  - With Engineering stationing (?), things upstream the change stay the same..but the do
+
+Notes is stuck:
+
+- POC:
+  - Segment changes/modifications
+  - 

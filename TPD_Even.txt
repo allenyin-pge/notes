@@ -1,0 +1,59 @@
+8/12: Even notes
+
+In beginning, previous guy Greg developed a model that didnt' perform well.
+
+Even:
+- Tuned the old model
+- Did data wrangling for the original data
+- All the data from MarinerDB -- best thing to start from.
+  - Data integration..special join to resectoionalize and add extra features
+   - Done by Jupyter scripts, output to csv
+   - Then process using "preprocessed_tpd.R" --> translated to TPD_RtoPython.ipynb -- also has the model
+	- Back then R was easier to do categorial modeling, etc
+   
+		Model details:
+		- ILI data is included, but doesn't cover all the pipelines...assume TPD risk distribution is similar to that on ILI pipelines.
+	     		- Use ILI subset as train/test to validate model.
+		- Spatial join of ILI with Mariner dataset..
+			- Even Cut the lines in sections, to make sure partial overlaps is not counted as full overlap
+			- Operation is called "dissolve" ...to get better results
+		        - "Dissolve_TPD_all_0623.csv" is from spatial join/dissolve with all the things in ArcGIS (data referenced is here: file://ffshare01-nas/RiskMgmt/S8L5/tpd/)
+			  - `mile = "05mile"` means: if at some point +/-0.5 miles TPD damage was identified, then that pipe segment is
+				labeled to have TPD damage.
+
+- Model explanations...factors are `gregfun`.
+ - OD_Adjusted, WT_Adjusted: Numbers are sometimes random looking due to recording-keeping differences over the years (actual reading vs. standardized readings).
+	- If numbers are in certain range and installation date is something..then cast it to some number with a lookup table
+        - Code is in "Auo_Table_Matching.ipynb"
+ - Thien-Tanh: Ask hime what "FinalClass2020" is
+ - "Name" = county name.
+ - "midlat"/"midlong" -- the coord of the mid-point of the segment
+ - "elevation" -- height of the segment
+ 
+
+Model development data source:
+- Used older ILI data for training, and more continuous segments for testing.
+- Did not use fully-random selection for train/test-split.
+  - Use random seed to determine where to cut a pipeline...cut 20% of a continuous segment as a test set, and use the rest as training set.
+- Labels of the model = Digin-tracker has confirmed TPD damage, ILI provides "unconfirmed" TPD damage
+  - Regression Random Forest = prob model, then pick threshold and check classification results on the ground-truth locations
+  - Use threshold tuning to represent risk tolerance
+
+Model results/presentations:
+- file://ffshare01-nas/RiskMgmt/S8L5/tpd/MIDS%20deliverable/
+
+
+
+
+X = {factors}
+Y = {damage, no damage}
+Y_damage ~ {dig-in tracker, ILI}
+Y_no_damage ~ {..}
+
+Classify everything from ILI that's not Dig-in damage as 0.
+
+Single year note:
+- Example: Pipelines corresponding to previous dig-in tracker may be removed already
+
+- We don't need to treat Pipe1_segment1 in 2023 as the same as Pipe1_segment1 in 2020 -- can pool data there
+  - Standardize the covariates
